@@ -1,0 +1,4 @@
+interface:
+  display_name: "AISC5030 Scientific Clustering"
+  short_description: "Run reproducible scientific clustering for AISC5030."
+  default_prompt: "Use $scientific-clustering to implement the next authorized stage of this AISC5030 Topic 3 project."

@@ -1,0 +1,75 @@
+project:
+  id: aisc5030-topic3-air-quality
+  topic: "Topic 3: Knowledge Discovery from Scientific Data"
+  task: unsupervised_clustering
+  stage: planning_and_scaffold_complete
+  model_execution_status: not_started
+  seed: 100
+data:
+  uci_id: 501
+  source_url: "https://archive.ics.uci.edu/static/public/501/beijing+multi+site+air+quality+data.zip"
+  archive: data/raw/beijing_air_quality_source.zip
+  csv: data/raw/PRSA_Data_Aotizhongxin_20130301-20170228.csv
+  station: Aotizhongxin
+  timezone: Asia/Shanghai
+  start: "2013-03-01"
+  end: "2017-02-28"
+  features: [PM2.5, PM10, SO2, NO2, CO, O3]
+  units: "ug/m^3"
+  minimum_valid_hours: 18
+  daily_aggregation: mean
+  missing_policy: complete_eligible_days_no_imputation
+  negative_concentration: mark_invalid
+  clip_extremes: false
+  expected_hourly_rows: 35064
+  expected_calendar_days: 1461
+  expected_eligible_days: 1333
+  excluded_from_clustering: ["No", date, timestamp, year, month, day, hour, season, station, TEMP, PRES, DEWP, RAIN, wd, WSPM]
+preprocessing:
+  main: log1p_standard_scaler
+  primary_sensitivity: raw_standard_scaler
+  pca_for_display_only: true
+  pca_components_display: 2
+algorithms:
+  kmeans:
+    k: [2, 3, 4, 5, 6, 7, 8]
+    seeds: [100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
+    representative_seed: 100
+    n_init: 20
+    max_iter: 300
+    algorithm: lloyd
+  ward:
+    backend: scipy_linkage_cut_tree
+    linkage: ward
+    metric: euclidean
+    k: [2, 3, 4, 5, 6, 7, 8]
+  dbscan:
+    role: supplementary
+    min_samples: [5, 10, 20]
+    eps_k_distance_quantiles: [0.70, 0.80, 0.90, 0.95]
+    quantile_method: linear
+    metric: euclidean
+selection:
+  minimum_cluster_size_absolute: 10
+  minimum_cluster_fraction: 0.01
+  silhouette_shortlist_tolerance: 0.02
+  stability_tie_tolerance: 0.02
+  weak_stability_warning_below: 0.70
+  dbscan_minimum_coverage_for_representative: 0.70
+  no_predefined_final_k: true
+stability:
+  block_days: 7
+  calendar_anchor: "2013-03-01"
+  retain_block_fraction: 0.80
+  sample_without_replacement: true
+  repetitions: 20
+  seeds: [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119]
+  refit_preprocessing: true
+evaluation:
+  space: six_dimensions_after_main_transform
+  internal: [silhouette, davies_bouldin, calinski_harabasz]
+  agreement: adjusted_rand_index
+  dbscan_exclude_noise_from_internal_metrics: true
+  invalid_metric_value: null
+  ground_truth_labels: none
+  predictive_metrics: []

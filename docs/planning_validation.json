@@ -1,0 +1,641 @@
+{
+  "checked_at_utc": "2026-11-14T16:28:08.129625+00:00",
+  "scope": "planning documents, repository skill, source preflight and directory scaffold",
+  "all_checks_passed": true,
+  "check_count": 126,
+  "local_markdown_links_checked": 36,
+  "clustering_executed": false,
+  "scientific_results_validated": false,
+  "checks": [
+    {
+      "name": "directory:docs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:references",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:configs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:data/raw",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:data/interim",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:data/processed",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:data/metadata",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:notebooks",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:src/air_quality_clustering",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:scripts",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:tests",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:results/runs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:results/figures",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:results/tables",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:results/labels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:results/stability",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:reports/templates",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:reports/final",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:presentations",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:artifacts",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:logs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "directory:.agents/skills/scientific-clustering/agents",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:README.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:AGENTS.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:requirements.txt",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:configs/project.yaml",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:docs/00_course_review.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:docs/01_project_proposal.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:docs/02_requirement_alignment.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:docs/03_execution_plan.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:docs/04_architecture.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:docs/05_data_dictionary.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:docs/06_experiment_protocol.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:docs/07_deliverables.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:docs/08_agent_handoff.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:references/sources.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:reports/templates/final_report.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:presentations/storyboard.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:.agents/skills/scientific-clustering/SKILL.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:.agents/skills/scientific-clustering/agents/openai.yaml",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:data/metadata/source_preflight.json",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:scripts/verify_source.py",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:scripts/verify_scaffold.py",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:tests/README.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "file:results/README.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "topic_is_3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "unsupervised_task",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "honest_unexecuted_state",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "exact_six_inputs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "quality_threshold",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "excluded_fields_are_strings",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no_background_in_inputs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "two_primary_methods",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "matched_k_grids",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "explicit_kmeans_restarts",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no_predictive_metrics",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "stability_refits_preprocessing",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "source:archive_sha256",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "source:selected_csv_sha256",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "source:station_rows",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "source:calendar_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "source:eligible_complete_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "source:excluded_calendar_days",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "source:columns",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "config_matches_source_count",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "raw_csv_matches_archive",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "skill_frontmatter",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "skill_prompt_invocation",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:.agents/skills/scientific-clustering/SKILL.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:.agents/skills/scientific-clustering/SKILL.md -> ../../../AGENTS.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:.agents/skills/scientific-clustering/SKILL.md -> ../../../docs/08_agent_handoff.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:.agents/skills/scientific-clustering/SKILL.md -> ../../../docs/03_execution_plan.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:.agents/skills/scientific-clustering/SKILL.md -> ../../../docs/04_architecture.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:.agents/skills/scientific-clustering/SKILL.md -> ../../../docs/05_data_dictionary.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:.agents/skills/scientific-clustering/SKILL.md -> ../../../docs/06_experiment_protocol.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:.agents/skills/scientific-clustering/SKILL.md -> ../../../docs/07_deliverables.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:.agents/skills/scientific-clustering/SKILL.md -> ../../../references/sources.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:.agents/skills/scientific-clustering/SKILL.md -> ../../../docs/02_requirement_alignment.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:AGENTS.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:data/README.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:data/README.md -> ../references/sources.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:docs/00_course_review.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:docs/00_course_review.md -> ../references/sources.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:docs/01_project_proposal.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:docs/01_project_proposal.md -> ../references/sources.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:docs/01_project_proposal.md -> 07_deliverables.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:docs/02_requirement_alignment.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:docs/03_execution_plan.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:docs/03_execution_plan.md -> 05_data_dictionary.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:docs/03_execution_plan.md -> 06_experiment_protocol.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:docs/04_architecture.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:docs/05_data_dictionary.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:docs/05_data_dictionary.md -> ../references/sources.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:docs/05_data_dictionary.md -> ../data/metadata/source_preflight.json",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:docs/06_experiment_protocol.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:docs/07_deliverables.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:docs/08_agent_handoff.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:notebooks/README.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:presentations/storyboard.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:README.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> docs/00_course_review.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> docs/01_project_proposal.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> docs/02_requirement_alignment.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> docs/03_execution_plan.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> docs/04_architecture.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> docs/05_data_dictionary.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> docs/06_experiment_protocol.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> docs/07_deliverables.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> docs/08_agent_handoff.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> references/sources.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> data/metadata/source_preflight.json",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> requirements.txt",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> AGENTS.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:README.md -> .agents/skills/scientific-clustering/SKILL.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:references/sources.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:references/sources.md -> ../Week%205/Week%205%20PPT.pdf",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:references/sources.md -> ../Week%205/Week%205%20Notebook.pdf",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:references/sources.md -> ../Week%205/Week%205%20Notebook.ipynb",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:references/sources.md -> ../Week%205/Week%205%20Project%20Topics.pdf",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:reports/templates/final_report.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:results/README.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:scripts/README.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:src/air_quality_clustering/README.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "link:src/air_quality_clustering/README.md -> ../../docs/04_architecture.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "utf8:tests/README.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no_model_runs_created",
+      "passed": true,
+      "detail": ""
+    }
+  ]
+}

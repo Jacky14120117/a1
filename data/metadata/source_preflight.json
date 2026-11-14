@@ -1,0 +1,91 @@
+{
+  "purpose": "source/schema/missingness feasibility preflight; no clustering performed",
+  "checked_at_utc": "2026-11-14T15:59:01.913006+00:00",
+  "source_url": "https://archive.ics.uci.edu/static/public/501/beijing+multi+site+air+quality+data.zip",
+  "dataset_doi": "10.24432/C5RK5G",
+  "license": "CC BY 4.0; see UCI source page",
+  "archive_path": "data/raw/beijing_air_quality_source.zip",
+  "archive_bytes": 8192212,
+  "archive_sha256": "b04da438b2f331ac0ffd45aebdfec0d20d2367feb5f6948c4b1f7ce1191e33c4",
+  "archive_members": [
+    "PRSA2017_Data_20130301-20170228.zip",
+    "2A2478DC-8517-4490-9FA7-36F9A7A542BE.JPG",
+    "data.csv",
+    "test.csv"
+  ],
+  "selected_member": "PRSA2017_Data_20130301-20170228.zip::PRSA_Data_20130301-20170228/PRSA_Data_Aotizhongxin_20130301-20170228.csv",
+  "selected_csv_sha256": "a94fbcfc71708b6ffdc033360163d91efb7f675e496f6b5860929aa96b96351b",
+  "columns": [
+    "No",
+    "year",
+    "month",
+    "day",
+    "hour",
+    "PM2.5",
+    "PM10",
+    "SO2",
+    "NO2",
+    "CO",
+    "O3",
+    "TEMP",
+    "PRES",
+    "DEWP",
+    "RAIN",
+    "wd",
+    "WSPM",
+    "station"
+  ],
+  "selected_station": "Aotizhongxin",
+  "station_rows": 35064,
+  "unique_hourly_timestamps": 35064,
+  "duplicate_hourly_timestamps": 0,
+  "first_local_timestamp": "2013-03-01T00:00:00",
+  "last_local_timestamp": "2017-02-28T23:00:00",
+  "timezone_interpretation": "Asia/Shanghai local timestamps, no UTC shift before daily grouping",
+  "calendar_days": 1461,
+  "clustering_features": [
+    "PM2.5",
+    "PM10",
+    "SO2",
+    "NO2",
+    "CO",
+    "O3"
+  ],
+  "hourly_missing_counts": {
+    "PM2.5": 925,
+    "PM10": 718,
+    "SO2": 935,
+    "NO2": 1023,
+    "CO": 1776,
+    "O3": 1719
+  },
+  "hourly_negative_counts": {
+    "PM2.5": 0,
+    "PM10": 0,
+    "SO2": 0,
+    "NO2": 0,
+    "CO": 0,
+    "O3": 0
+  },
+  "minimum_valid_hours_per_pollutant_per_day": 18,
+  "eligible_days_per_pollutant": {
+    "PM2.5": 1423,
+    "PM10": 1435,
+    "SO2": 1425,
+    "NO2": 1425,
+    "CO": 1374,
+    "O3": 1399
+  },
+  "eligible_complete_days": 1333,
+  "excluded_calendar_days": 128,
+  "eligible_fraction": 0.9123887748117727,
+  "eligible_days_by_year": {
+    "2013": 234,
+    "2014": 335,
+    "2015": 351,
+    "2016": 356,
+    "2017": 57
+  },
+  "clustering_status": "not_started",
+  "selected_csv_path": "data/raw/PRSA_Data_Aotizhongxin_20130301-20170228.csv"
+}

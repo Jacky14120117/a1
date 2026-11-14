@@ -1,0 +1,11 @@
+# Suggested implementation ranges; not a validated or locked environment yet.
+numpy>=1.26,<3
+pandas>=2.2,<4
+scipy>=1.12,<2
+scikit-learn>=1.5,<2
+matplotlib>=3.8,<4
+seaborn>=0.13,<1
+PyYAML>=6,<7
+jupyterlab>=4,<5
+nbclient>=0.10,<1
+pytest>=8,<10

@@ -218,3 +218,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local planning intermediates and recoverable public source data
+/tmp/
+/data/raw/*.zip
+/data/raw/*.csv
