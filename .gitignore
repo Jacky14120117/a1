@@ -223,3 +223,9 @@ __marimo__/
 /tmp/
 /data/raw/*.zip
 /data/raw/*.csv
+
+# Regenerable derived tables and executed notebook copies
+# (rebuild via scripts/run_project.py and scripts/run_notebooks.py)
+/data/interim/
+/data/processed/
+/notebooks/executed/

@@ -65,6 +65,10 @@ stability:
   repetitions: 20
   seeds: [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119]
   refit_preprocessing: true
+eda:
+  figures: [F01_monthly_coverage, F02_distributions, F03_correlation, F04_time_series]
+  figure_dpi: 300
+  correlation_method: spearman
 evaluation:
   space: six_dimensions_after_main_transform
   internal: [silhouette, davies_bouldin, calinski_harabasz]

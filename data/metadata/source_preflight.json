@@ -1,6 +1,6 @@
 {
   "purpose": "source/schema/missingness feasibility preflight; no clustering performed",
-  "checked_at_utc": "2026-11-14T15:59:01.913006+00:00",
+  "checked_at_utc": "2026-11-15T18:02:35.348439+00:00",
   "source_url": "https://archive.ics.uci.edu/static/public/501/beijing+multi+site+air+quality+data.zip",
   "dataset_doi": "10.24432/C5RK5G",
   "license": "CC BY 4.0; see UCI source page",
