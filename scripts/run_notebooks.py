@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 NOTEBOOKS = {
     "01": "01_data_audit_and_eda.ipynb",
     "02": "02_clustering_experiments.ipynb",
+    "03": "03_interpretation_and_robustness.ipynb",
 }
 
 

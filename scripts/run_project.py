@@ -5,9 +5,8 @@ Usage (from any working directory):
     python scripts/run_project.py --stage eda cluster --config configs/project.yaml
     python scripts/run_project.py --stage all --config configs/project.yaml
 
-Implemented stages: prepare | eda | cluster. Later stages (stability,
-compare, sensitivity, export) are defined by docs/03_execution_plan.md and
-return an explicit "not implemented" error until built.
+Implemented stages: prepare | eda | cluster | stability | compare |
+sensitivity | export (export = final report from the run's real numbers).
 
 One invocation = one run directory = one manifest. Within a run, downstream
 stages reuse in-memory tables; across runs, upstream outputs are verified by
@@ -41,8 +40,10 @@ from air_quality_clustering.data import prepare_tables  # noqa: E402
 from air_quality_clustering.evaluation import ari  # noqa: E402
 from air_quality_clustering.features import build_feature_matrix  # noqa: E402
 from air_quality_clustering import plots  # noqa: E402
+from air_quality_clustering import discovery, stability  # noqa: E402
+from air_quality_clustering import report as report_mod  # noqa: E402
 
-IMPLEMENTED_STAGES = ("prepare", "eda", "cluster")
+IMPLEMENTED_STAGES = ("prepare", "eda", "cluster", "stability", "compare", "sensitivity", "export")
 PROCESSED_TABLES = ("daily_coverage", "daily_pollutants", "excluded_days", "daily_context")
 
 
@@ -209,6 +210,9 @@ def stage_cluster(cfg, run_dir: Path, state: dict) -> dict:
     labels.update(km_labels)
     labels.update(ward_labels)
     labels.update(db_labels)
+    state["experiments"] = pd.DataFrame(rows)
+    state["labels"] = labels
+    state["cluster_run"] = run_dir
 
     experiments = pd.DataFrame(rows)
     experiments.insert(0, "run_id", run_dir.name)
@@ -284,8 +288,280 @@ def stage_cluster(cfg, run_dir: Path, state: dict) -> dict:
     return {"outputs": outputs, "summary": summary, "warnings": warnings, "checks": checks}
 
 
+def _ensure_run_data(cfg, state: dict) -> None:
+    """Load daily/matrix/experiments/labels from state or verified upstream run."""
+    if "tables" not in state:
+        upstream = _latest_completed_run(cfg.root, "prepare")
+        state["tables"] = {name: _verified_table(cfg.root, name, upstream) for name in PROCESSED_TABLES}
+    if "matrix" not in state:
+        state["matrix"] = build_feature_matrix(state["tables"]["daily_pollutants"], cfg.main_representation)
+    if "experiments" not in state:
+        upstream = _latest_completed_run(cfg.root, "cluster")
+        if upstream is None:
+            raise UpstreamError("no completed cluster run; run --stage cluster first")
+        state["experiments"] = pd.read_csv(upstream / "experiments.csv")
+        labels = {}
+        for path in sorted((upstream / "labels").glob("*.csv")):
+            labels[path.stem] = pd.read_csv(path)["cluster"].to_numpy()
+        state["labels"] = labels
+        state["cluster_run"] = upstream
+
+
+def stage_stability(cfg, run_dir: Path, state: dict) -> dict:
+    _ensure_run_data(cfg, state)
+    daily = state["tables"]["daily_pollutants"]
+    matrix = state["matrix"]
+    experiments = state["experiments"]
+    labels = state["labels"]
+    n = len(daily)
+    raw = daily[POLLUTANTS_ORDER].to_numpy(dtype="float64")
+
+    selection = stability.select_representatives(experiments, pd.DataFrame(), cfg, n)
+    km_ks = [int(c["k"]) for c in selection["methods"]["kmeans"]["candidates"] if c["shortlisted"]]
+    ward_ks = [int(c["k"]) for c in selection["methods"]["ward"]["candidates"] if c["shortlisted"]]
+
+    db_selection = stability.select_dbscan_representative(experiments, cfg, n)
+    db_setting = None
+    if db_selection["representative"] is not None:
+        rep = db_selection["representative"]
+        db_setting = {"experiment_id": rep["experiment_id"],
+                      "min_samples": rep["min_samples"], "eps": rep["eps"]}
+
+    rep_df, db_df, subsets = stability.block_stability(
+        raw, matrix.dates, labels, km_ks, ward_ks, cfg, db_setting
+    )
+    agg = stability.aggregate_stability(rep_df)
+    selection = stability.select_representatives(experiments, agg, cfg, n)
+    selection["dbscan"] = db_selection
+    selection["stability_aggregate"] = agg.to_dict(orient="records")
+    selection["block_subsets"] = subsets
+
+    outputs = {}
+    _write_csv(rep_df, run_dir / "stability" / "repetitions.csv")
+    outputs["stability_repetitions"] = run_dir / "stability" / "repetitions.csv"
+    _write_csv(agg, run_dir / "stability" / "aggregate.csv")
+    outputs["stability_aggregate"] = run_dir / "stability" / "aggregate.csv"
+    if len(db_df):
+        _write_csv(db_df, run_dir / "stability" / "dbscan_repetitions.csv")
+        outputs["dbscan_stability"] = run_dir / "stability" / "dbscan_repetitions.csv"
+    provenance.write_json(run_dir / "selection.json", selection)
+    outputs["selection"] = run_dir / "selection.json"
+    state["selection"] = selection
+    state["stability_agg"] = agg
+    state["stability_reps"] = rep_df
+
+    reps = {a: selection["methods"][a]["representative"] for a in ("kmeans", "ward")}
+    summary = {
+        "shortlisted_kmeans": km_ks, "shortlisted_ward": ward_ks,
+        "representatives": {a: (r["k"] if r else None) for a, r in reps.items()},
+        "median_ari": {a: (r["median_ari"] if r else None) for a, r in reps.items()},
+        "weak_stability": {a: (r["weak_stability"] if r else None) for a, r in reps.items()},
+        "dbscan_representative": db_selection["representative"],
+        "dbscan_reason": db_selection["reason"],
+    }
+    warnings = []
+    for a, r in reps.items():
+        if r is None:
+            warnings.append(f"{a}: no eligible representative under min-cluster rule")
+        elif r["weak_stability"]:
+            warnings.append(f"{a}: representative median block ARI below 0.70 (weak stability)")
+    checks = {"stability_rows": len(rep_df), "shortlist_km": len(km_ks), "shortlist_ward": len(ward_ks)}
+    return {"outputs": outputs, "summary": summary, "warnings": warnings, "checks": checks}
+
+
+def stage_compare(cfg, run_dir: Path, state: dict) -> dict:
+    _ensure_run_data(cfg, state)
+    if "selection" not in state:
+        upstream = _latest_completed_run(cfg.root, "stability")
+        state["selection"] = json.loads((upstream / "selection.json").read_text(encoding="utf-8"))
+    selection = state["selection"]
+    daily = state["tables"]["daily_pollutants"]
+    context = state["tables"]["daily_context"]
+    labels = state["labels"]
+    matrix = state["matrix"]
+
+    reps = {}
+    for algorithm in ("kmeans", "ward"):
+        r = selection["methods"][algorithm]["representative"]
+        if r is None:
+            continue
+        k = int(r["k"])
+        ref_id = (f"E01_k{k}_s{cfg.algorithms['kmeans']['representative_seed']}"
+                  if algorithm == "kmeans" else f"E02_k{k}")
+        reps[algorithm] = (k, labels[ref_id])
+    if len(reps) < 2:
+        raise UpstreamError("compare needs both primary representatives; check selection.json")
+
+    profiles = pd.concat([
+        discovery.cluster_profiles(daily, lab, algorithm)
+        for algorithm, (_, lab) in reps.items()
+    ], ignore_index=True)
+    mappings = {a: discovery.display_mapping(profiles, a) for a in reps}
+    _write_csv(profiles, run_dir / "tables" / "cluster_profiles.csv")
+    provenance.write_json(run_dir / "artifacts" / "display_mapping.json", mappings)
+
+    km_lab, ward_lab = reps["kmeans"][1], reps["ward"][1]
+    cont = discovery.contingency(km_lab, ward_lab)
+    cont.to_csv(run_dir / "tables" / "contingency.csv", encoding="utf-8")
+    rep_ari = ari(km_lab, ward_lab)
+    upstream_cluster = state.get("cluster_run") or _latest_completed_run(cfg.root, "cluster")
+    same_k = pd.read_csv(upstream_cluster / "tables" / "same_k_ari.csv")
+
+    background = {}
+    for algorithm, (_, lab) in reps.items():
+        tables = discovery.background_tables(daily, context, lab, algorithm)
+        for name, frame in tables.items():
+            if name == "weather_profiles":
+                background.setdefault(name, []).append(frame)
+            else:
+                frame.to_csv(run_dir / "tables" / f"{name}_{algorithm}.csv", encoding="utf-8")
+        background.setdefault("season_pct_of_cluster", {})[algorithm] = tables["season_pct_of_cluster"]
+        background.setdefault("season_pct_of_season", {})[algorithm] = tables["season_pct_of_season"]
+    weather = pd.concat(background.pop("weather_profiles"), ignore_index=True)
+    _write_csv(weather, run_dir / "tables" / "weather_profiles.csv")
+
+    coords, variance = discovery.pca_display(matrix.X, int(cfg.preprocessing["pca_components_display"]))
+    provenance.write_json(run_dir / "artifacts" / "pca_variance.json",
+                          {"explained_variance_ratio": variance.tolist()})
+    panels = {f"K-Means k={reps['kmeans'][0]}": km_lab, f"Ward k={reps['ward'][0]}": ward_lab}
+    db_rep = selection.get("dbscan", {}).get("representative")
+    if db_rep is not None:
+        panels[f"DBSCAN {db_rep['experiment_id']}"] = labels[db_rep["experiment_id"]]
+
+    figures_dir = run_dir / "figures"
+    figures = {
+        "F08_pca": plots.fig_f08_pca_panels(coords, variance, panels, mappings, figures_dir / "F08_pca_panels.png"),
+        "F09_kmeans": plots.fig_f09_profiles(profiles, "kmeans", mappings["kmeans"], figures_dir / "F09_profiles_kmeans.png"),
+        "F09_ward": plots.fig_f09_profiles(profiles, "ward", mappings["ward"], figures_dir / "F09_profiles_ward.png"),
+        "F10_agreement": plots.fig_f10_agreement(cont, same_k, rep_ari, figures_dir / "F10_agreement.png"),
+        "F11_background": plots.fig_f11_background(
+            background["season_pct_of_cluster"]["kmeans"], weather[weather["algorithm"] == "kmeans"],
+            figures_dir / "F11_background.png"),
+    }
+    state["compare"] = {"representative_ari": rep_ari, "mappings": mappings,
+                        "reps": {a: k for a, (k, _) in reps.items()},
+                        "variance": variance.tolist(), "profiles": profiles,
+                        "contingency": cont, "weather": weather,
+                        "season": background["season_pct_of_cluster"]["kmeans"],
+                        "season_ward": background["season_pct_of_cluster"]["ward"],
+                        "season_of_season": background["season_pct_of_season"]["kmeans"]}
+    state["compare_run"] = run_dir
+    outputs = {**{k: Path(v) for k, v in figures.items()},
+               "cluster_profiles": run_dir / "tables" / "cluster_profiles.csv",
+               "contingency": run_dir / "tables" / "contingency.csv",
+               "weather_profiles": run_dir / "tables" / "weather_profiles.csv"}
+    summary = {"representative_ari": rep_ari, "pca_variance": variance.tolist(),
+               "figures": [p.name for p in figures.values()]}
+    return {"outputs": outputs, "summary": summary, "warnings": [],
+            "checks": {"profile_rows": len(profiles), "contingency_shape": list(cont.shape)}}
+
+
+def stage_sensitivity(cfg, run_dir: Path, state: dict) -> dict:
+    _ensure_run_data(cfg, state)
+    if "selection" not in state:
+        upstream = _latest_completed_run(cfg.root, "stability")
+        state["selection"] = json.loads((upstream / "selection.json").read_text(encoding="utf-8"))
+    selection = state["selection"]
+    ks = {}
+    for algorithm in ("kmeans", "ward"):
+        r = selection["methods"][algorithm]["representative"]
+        if r is not None:
+            ks[algorithm] = int(r["k"])
+    sens_df, sizes_df = discovery.sensitivity_branch(
+        state["tables"]["daily_pollutants"], state["labels"], ks, cfg
+    )
+    _write_csv(sens_df, run_dir / "sensitivity" / "representation_ari.csv")
+    _write_csv(sizes_df, run_dir / "sensitivity" / "cluster_sizes.csv")
+
+    agg = state.get("stability_agg")
+    if agg is None:
+        upstream = _latest_completed_run(cfg.root, "stability")
+        agg = pd.read_csv(upstream / "stability" / "aggregate.csv")
+    figures = {
+        "F12": plots.fig_f12_stability_sensitivity(agg, sens_df, run_dir / "figures" / "F12_stability_sensitivity.png"),
+    }
+    state["sensitivity"] = sens_df
+    outputs = {**{k: Path(v) for k, v in figures.items()},
+               "representation_ari": run_dir / "sensitivity" / "representation_ari.csv",
+               "sensitivity_sizes": run_dir / "sensitivity" / "cluster_sizes.csv"}
+    summary = {"ari_vs_main": sens_df[["algorithm", "k", "ari_vs_main"]].to_dict(orient="records")}
+    return {"outputs": outputs, "summary": summary, "warnings": [],
+            "checks": {"sensitivity_rows": len(sens_df)}}
+
+
+def stage_export(cfg, run_dir: Path, state: dict) -> dict:
+    _ensure_run_data(cfg, state)
+    # Same-invocation state first; the manifest is only written after ALL
+    # stages succeed, so upstream lookups must not depend on it mid-run.
+    if "selection" not in state or "stability_agg" not in state:
+        upstream = _latest_completed_run(cfg.root, "stability")
+        if upstream is None:
+            raise UpstreamError("stability outputs missing; run --stage stability first")
+        state.setdefault("selection", json.loads((upstream / "selection.json").read_text(encoding="utf-8")))
+        state.setdefault("stability_agg", pd.read_csv(upstream / "stability" / "aggregate.csv"))
+    if "compare" not in state:
+        upstream_c = _latest_completed_run(cfg.root, "compare")
+        if upstream_c is None:
+            raise UpstreamError("compare outputs missing; run --stage compare first")
+        state["compare"] = {
+            "mappings": json.loads((upstream_c / "artifacts" / "display_mapping.json").read_text(encoding="utf-8")),
+            "reps": {a: int(state["selection"]["methods"][a]["representative"]["k"]) for a in ("kmeans", "ward")},
+            "variance": json.loads((upstream_c / "artifacts" / "pca_variance.json").read_text(encoding="utf-8"))["explained_variance_ratio"],
+        }
+    if "sensitivity" not in state:
+        upstream_s = _latest_completed_run(cfg.root, "sensitivity")
+        if upstream_s is None:
+            raise UpstreamError("sensitivity outputs missing; run --stage sensitivity first")
+        state["sensitivity"] = pd.read_csv(upstream_s / "sensitivity" / "representation_ari.csv")
+    compare = state["compare"]
+    if "profiles" not in compare:
+        upstream_c = state.get("compare_run") or _latest_completed_run(cfg.root, "compare")
+        compare["profiles"] = pd.read_csv(upstream_c / "tables" / "cluster_profiles.csv")
+        compare["contingency"] = pd.read_csv(upstream_c / "tables" / "contingency.csv", index_col=0)
+        compare["weather"] = pd.read_csv(upstream_c / "tables" / "weather_profiles.csv")
+        compare["season"] = pd.read_csv(upstream_c / "tables" / "season_pct_of_cluster_kmeans.csv", index_col=0)
+        compare["season_ward"] = pd.read_csv(upstream_c / "tables" / "season_pct_of_cluster_ward.csv", index_col=0)
+        compare["season_of_season"] = pd.read_csv(upstream_c / "tables" / "season_pct_of_season_kmeans.csv", index_col=0)
+    if compare.get("representative_ari") is None:
+        labels = state["labels"]
+        k_km, k_w = compare["reps"]["kmeans"], compare["reps"]["ward"]
+        compare["representative_ari"] = ari(
+            labels[f"E01_k{k_km}_s{cfg.algorithms['kmeans']['representative_seed']}"],
+            labels[f"E02_k{k_w}"],
+        )
+
+    # Assemble every referenced figure into this run so report.md's relative
+    # links resolve; sources are copied, never moved or altered.
+    import shutil
+
+    figures_dir = run_dir / "figures"
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    source_runs = [state.get("cluster_run"), _latest_completed_run(cfg.root, "eda"),
+                   _latest_completed_run(cfg.root, "compare"),
+                   _latest_completed_run(cfg.root, "sensitivity")]
+    for source in source_runs:
+        if source is None or source == run_dir:
+            continue
+        for png in sorted((source / "figures").glob("*.png")):
+            target = figures_dir / png.name
+            if not target.exists():
+                shutil.copyfile(png, target)
+
+    report_path = report_mod.write_report(cfg, run_dir, state)
+    state["report_path"] = report_path
+    outputs = {"report": report_path}
+    outputs.update({f"figure_{p.stem}": p for p in sorted(figures_dir.glob("*.png"))})
+    summary = {"report": str(report_path)}
+    return {"outputs": outputs, "summary": summary, "warnings": [],
+            "checks": {"report_bytes": report_path.stat().st_size}}
+
+
 POLLUTANTS_ORDER = ["PM2.5", "PM10", "SO2", "NO2", "CO", "O3"]
-STAGE_FUNCTIONS = {"prepare": stage_prepare, "eda": stage_eda, "cluster": stage_cluster}
+STAGE_FUNCTIONS = {
+    "prepare": stage_prepare, "eda": stage_eda, "cluster": stage_cluster,
+    "stability": stage_stability, "compare": stage_compare,
+    "sensitivity": stage_sensitivity, "export": stage_export,
+}
 
 
 def main() -> int:

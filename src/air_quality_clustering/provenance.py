@@ -88,11 +88,16 @@ def write_json(path: str | Path, payload: Any) -> None:
 
 
 def file_hashes(paths: Iterable[str | Path], root: str | Path) -> dict[str, str]:
-    root = Path(root)
+    root = Path(root).resolve()
     result: dict[str, str] = {}
     for path in paths:
-        path = Path(path)
-        result[path.relative_to(root).as_posix()] = sha256_file(path)
+        path = Path(path).resolve()
+        try:
+            key = path.relative_to(root).as_posix()
+        except ValueError:
+            # outputs living inside results/runs/<id>/ are keyed from results/
+            key = path.relative_to(root / "results").as_posix()
+        result[key] = sha256_file(path)
     return result
 
 

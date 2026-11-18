@@ -181,3 +181,118 @@ def fig_f07_dbscan(
     fig.suptitle("F07 DBSCAN density assumptions on the main representation", y=1.02)
     fig.tight_layout()
     return _save(fig, path)
+
+
+def _display_colors(labels: np.ndarray, mapping: dict[int, int]) -> np.ndarray:
+    palette = ["#4878a8", "#d1495b", "#59a14f", "#edc948", "#b07aa1", "#76b7b2", "#ff9da7"]
+    return np.array([palette[(mapping.get(int(l), int(l) + 1) - 1) % len(palette)] for l in labels])
+
+
+def fig_f08_pca_panels(
+    coords: np.ndarray,
+    variance_ratio: np.ndarray,
+    panels: dict[str, np.ndarray],
+    mappings: dict[str, dict[int, int]],
+    path: str | Path,
+) -> Path:
+    """Shared PCA coordinates; same dates organised by each method."""
+    fig, axes = plt.subplots(1, len(panels), figsize=(6 * len(panels), 5))
+    if len(panels) == 1:
+        axes = [axes]
+    for ax, (name, labels) in zip(axes, panels.items()):
+        colors = _display_colors(labels, mappings.get(name, {}))
+        ax.scatter(coords[:, 0], coords[:, 1], c=colors, s=6, alpha=0.7)
+        ax.set_title(name, fontsize=10)
+        ax.set_xlabel(f"PC1 ({variance_ratio[0]:.1%} var)")
+        ax.set_ylabel(f"PC2 ({variance_ratio[1]:.1%} var)")
+    fig.suptitle(
+        f"F08 Shared PCA projection (display only; PC1+PC2 = {sum(variance_ratio[:2]):.1%} of variance)",
+        y=1.02,
+    )
+    fig.tight_layout()
+    return _save(fig, path)
+
+
+def fig_f09_profiles(profiles: pd.DataFrame, algorithm: str, mapping: dict[int, int], path: str | Path) -> Path:
+    """Original-unit medians with IQR bars per cluster; sizes annotated."""
+    sub = profiles[profiles["algorithm"] == algorithm]
+    clusters = sorted(sub["cluster"].unique(), key=lambda c: mapping.get(int(c), int(c)))
+    fig, axes = plt.subplots(1, 6, figsize=(17, 4.5), sharey=False)
+    for ax, column in zip(axes, POLLUTANTS):
+        data = sub[sub["pollutant"] == column].set_index("cluster").loc[clusters]
+        x = np.arange(len(clusters))
+        ax.bar(x, data["median"], color="#4878a8",
+               yerr=np.vstack([data["median"] - data["q1"], data["q3"] - data["median"]]),
+               capsize=3, error_kw={"linewidth": 1})
+        ax.set_xticks(x)
+        ax.set_xticklabels([f"C{mapping.get(int(c), int(c) + 1)}\nn={int(n)}"
+                            for c, n in zip(clusters, data["n_days"])], fontsize=8)
+        ax.set_title(column, fontsize=9)
+        ax.set_ylabel(UNITS, fontsize=8)
+    fig.suptitle(f"F09 {algorithm} cluster profiles: original-unit medians ± IQR (display order by PM2.5)", y=1.02)
+    fig.tight_layout()
+    return _save(fig, path)
+
+
+def fig_f10_agreement(
+    cont: pd.DataFrame, same_k: pd.DataFrame, representative_ari: float, path: str | Path
+) -> Path:
+    fig, axes = plt.subplots(1, 2, figsize=(13, 5))
+    sns.heatmap(cont, annot=True, fmt="d", cmap="Blues", ax=axes[0])
+    axes[0].set_title(f"Representative partitions: contingency (ARI={representative_ari:.3f})")
+    axes[0].set_xlabel("Ward cluster")
+    axes[0].set_ylabel("K-Means cluster")
+    axes[1].plot(same_k["k"], same_k["ari_kmeans_seed100_vs_ward"], marker="o", color="#d1495b")
+    axes[1].axhline(representative_ari, linestyle="--", color="grey", linewidth=1)
+    axes[1].set_title("Same-k ARI: algorithm difference at equal cluster count")
+    axes[1].set_xlabel("k")
+    axes[1].set_ylabel("ARI")
+    axes[1].set_ylim(-0.1, 1.05)
+    fig.suptitle("F10 Method agreement: counts differ from geometry", y=1.02)
+    fig.tight_layout()
+    return _save(fig, path)
+
+
+def fig_f11_background(
+    season_pct_of_cluster: pd.DataFrame, weather_profiles: pd.DataFrame, path: str | Path
+) -> Path:
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    season_pct_of_cluster.plot(kind="bar", stacked=True, ax=axes[0],
+                               color=["#59a14f", "#edc948", "#ff9da7", "#4878a8"])
+    axes[0].set_title("Season composition within each cluster (denominator = cluster days)")
+    axes[0].set_ylabel("fraction of cluster days")
+    axes[0].legend(fontsize=8)
+    temp = weather_profiles[weather_profiles["variable"] == "TEMP_mean"]
+    axes[1].bar(temp["cluster"].astype(str), temp["median"], color="#d1495b",
+                yerr=np.vstack([temp["median"] - temp["q1"], temp["q3"] - temp["median"]]),
+                capsize=3)
+    axes[1].set_title("Daily mean temperature by cluster (°C, median ± IQR)")
+    axes[1].set_xlabel("cluster")
+    fig.suptitle("F11 Background context AFTER frozen selection (descriptive, not causal)", y=1.02)
+    fig.tight_layout()
+    return _save(fig, path)
+
+
+def fig_f12_stability_sensitivity(
+    stability_agg: pd.DataFrame, sensitivity: pd.DataFrame, path: str | Path
+) -> Path:
+    fig, axes = plt.subplots(1, 2, figsize=(13, 5))
+    for algorithm, marker in (("kmeans", "o"), ("ward", "s")):
+        sub = stability_agg[stability_agg["algorithm"] == algorithm].sort_values("k")
+        axes[0].errorbar(
+            sub["k"], sub["median_ari"],
+            yerr=np.vstack([sub["median_ari"] - sub["q1_ari"], sub["q3_ari"] - sub["median_ari"]]),
+            marker=marker, label=algorithm, capsize=3,
+        )
+    axes[0].axhline(0.70, linestyle="--", color="grey", linewidth=1)
+    axes[0].set_title("Temporal-block stability: median ARI ± IQR (20 reps)")
+    axes[0].set_xlabel("k")
+    axes[0].set_ylabel("ARI vs full-data reference")
+    axes[0].legend()
+    axes[1].bar(sensitivity["algorithm"], sensitivity["ari_vs_main"], color="#59a14f")
+    axes[1].set_title("Representation sensitivity: raw+scaler vs log1p+scaler at frozen k")
+    axes[1].set_ylabel("ARI")
+    axes[1].set_ylim(0, 1.05)
+    fig.suptitle("F12 Robustness: data perturbation and transformation", y=1.02)
+    fig.tight_layout()
+    return _save(fig, path)

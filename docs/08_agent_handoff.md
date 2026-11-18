@@ -68,3 +68,22 @@
 - Notebook：`scripts/build_notebooks.py` 用 nbformat 生成 01/02（只调用 src 与运行产物，不复制实现）；`scripts/run_notebooks.py` 用 nbclient 实际从头执行两本均成功，执行副本在 `notebooks/executed/`。
 - 尚未执行：T08 代表设置选择与时间块稳定性、T09–T10 解释与敏感性、T11–T12 报告与干净复现。不得把候选指标写成最终结论。
 - 下一步：实现 `stability.py` 与 T08 选择规则（最小簇 14 日 → silhouette 差 ≤0.02 入围 → 20 次七日块 ARI 选代表），冻结后才进入季节/气象解释。
+
+### 2026-11-17（Asia/Shanghai）：T08–T11 完成，全流水线与报告交付
+
+- 新增模块：`stability.py`（七日块 209 块、20 次抽 167 块、子集重拟合缩放与模型、入围/代表/弱稳定性规则、DBSCAN 代表规则与噪声 Jaccard）、`discovery.py`（原始单位画像、列联、季节/年份/气象背景、PCA 仅展示、raw+scaler 敏感性）、`report.py`（全部数字取自运行产物的英文报告生成器）；`plots.py` 增 F08–F12。
+- 入口扩展为七阶段 `prepare eda cluster stability compare sensitivity export`；同一次调用内状态复用，跨调用按 manifest+SHA256 校验；export 会把各来源运行图表补齐到本运行目录保证报告相对引用完整。
+- 测试合计 30 项全部通过（新增 stability 7 项：块锚点/末块不足七日、子集确定性与无放回、最小簇排除、入围与并列取小 k、无合格代表、弱稳定性标志、DBSCAN 代表规则、失败次数不掩盖）。
+- 完整运行 `20261116T193443Z-75ddd759` 七阶段 completed 无警告；收尾与报告最终运行 `20261116T193840Z-75ddd759`（export，含 13 张图与 report.md）。
+- 真实结论：两主方法代表均 k=2（K-Means 中位块 ARI 0.970；Ward 0.707，刚过 0.70 警示线，IQR 0.554–0.799）；代表间 ARI 0.892，列联 799/13/24/497；同 k ARI 0.359–0.892。DBSCAN 无合格代表（11/12 单簇+噪声；唯一多簇设置覆盖率 0.858 但最小簇 <14 日）。敏感性：raw+scaler 下 K-Means ARI 0.392（划分明显重组）、Ward 0.719——log1p 是显式建模决定，报告如实区分。画像：C1 低负荷富臭氧（PM2.5 中位 39.0，O3 66.0，n=812），C2 高颗粒物/CO（PM2.5 119.5，O3 22.8，n=521）；C2 冬季占 36.1%、夏季 6.3%，温度中位 6.7°C vs C1 20.5°C（描述性，非因果）。
+- Notebook 03 新增并三本全部 nbclient 从头执行成功。报告 Word 版经 md2docx 转换（13 图、10 表嵌入），交付副本在会话 outputs；项目内权威版本为运行目录 report.md。
+- 环境注意：助理运行时 PYTHONPATH 会注入 cp314 依赖包，与项目 .venv(3.12) 冲突；运行项目命令前需在该进程清空 PYTHONPATH（未改系统配置）。
+- 尚未做：T12 干净环境复现（新 venv 重装锁文件后重跑 all）与答辩 PPT；GitHub 推送已由用户自行通过 SSH 完成（远程已改为用户个人仓库 a1）。
+
+### 2026-11-18（Asia/Shanghai）：应用户要求复核代码与结果，报告补全双方向季节表
+
+- 新增 `scripts/verify_results.py`：独立复核漏斗口径（从 hourly_clean 重算 coverage/日均）、89 标签日期完整性、Ward 切分嵌套性、画像与原始中位数一致性、选参不变量、报告数字抽查；`--baseline` 模式跨运行对比指标/标签/选参/稳定性/敏感性。
+- 报告完善：第 9 节补 Ward 季节构成表与"季节内簇占比"反方向表（协议要求双方向、分母写明）；Word 版同步重转（12 表 13 图）。
+- 从头重跑全流水线：run `20261117T225450Z-75ddd759` 七阶段 completed 无警告；30 项测试通过；三本 Notebook 再次从头执行成功。
+- 复核结论：17 项校验 ALL CHECKS PASSED；与基线运行 `20261116T193443Z` 对比，89 组指标逐值一致、89 份划分 ARI=1、代表/稳定性/敏感性完全相同——结果可复现、无计算错误。唯一曾 FAIL 项为校验脚本整表 dtype 严格比较的误报（CSV 往返布尔列变 object），已改为逐列语义比较。
+- 权威报告现为 `results/runs/20261117T225450Z-75ddd759/report.md`；交付 Word 原地更新。

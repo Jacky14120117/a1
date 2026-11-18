@@ -1,0 +1,22 @@
+{
+  "calendar_days": 1461,
+  "eligible_days": 1333,
+  "excluded_days": 128,
+  "hourly_missing_counts": {
+    "year": 0,
+    "month": 0,
+    "day": 0,
+    "hour": 0,
+    "PM2.5": 1850,
+    "PM10": 1436,
+    "SO2": 1870,
+    "NO2": 2046,
+    "CO": 3552,
+    "O3": 3438,
+    "TEMP": 40,
+    "PRES": 40,
+    "DEWP": 40,
+    "WSPM": 28,
+    "RAIN": 40
+  }
+}

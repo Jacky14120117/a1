@@ -197,12 +197,87 @@ def build_02() -> nbf.NotebookNode:
     return nb
 
 
+def build_03() -> nbf.NotebookNode:
+    nb = nbf.v4.new_notebook()
+    cells = [
+        nbf.v4.new_markdown_cell(
+            "# 03 · Interpretation, stability & sensitivity (T08–T10)\n\n"
+            "Reads the authoritative run outputs after `--stage stability compare sensitivity`. "
+            "Selection was frozen BEFORE any season/weather view; this notebook only interprets. "
+            "Core logic lives in `src/air_quality_clustering/stability.py` and `discovery.py`."
+        ),
+        nbf.v4.new_code_cell(
+            LOCATOR + "\n"
+            "run_name, RUN, manifest = latest_run('sensitivity')\n"
+            "print('run_id:', run_name)\n"
+            "selection = json.loads((RUN / 'selection.json').read_text(encoding='utf-8'))\n"
+            "for a in ('kmeans', 'ward'):\n"
+            "    r = selection['methods'][a]['representative']\n"
+            "    print(a, 'representative:', r)\n"
+            "print('dbscan:', selection['dbscan']['representative'], selection['dbscan']['reason'])"
+        ),
+        nbf.v4.new_markdown_cell(
+            "## 1. Temporal-block stability (20 refit resamples per shortlisted k)\n\n"
+            "Failed repetitions are counted, not masked. These ARIs carry exploratory selection "
+            "bias because k was chosen with them; they are not confidence intervals."
+        ),
+        nbf.v4.new_code_cell(
+            "pd.read_csv(RUN / 'stability' / 'aggregate.csv').round(4)"
+        ),
+        nbf.v4.new_code_cell("display(Image(filename=str(RUN / 'figures' / 'F12_stability_sensitivity.png')))"),
+        nbf.v4.new_markdown_cell(
+            "## 2. Cluster profiles in ORIGINAL units\n\n"
+            "Medians/IQRs of raw daily concentrations by actual label; display order by PM2.5 "
+            "median (mapping in artifacts/display_mapping.json). No back-transformed log centroids."
+        ),
+        nbf.v4.new_code_cell(
+            "profiles = pd.read_csv(RUN / 'tables' / 'cluster_profiles.csv')\n"
+            "profiles[profiles.algorithm == 'kmeans'].pivot(index='cluster', columns='pollutant', values='median').round(1)"
+        ),
+        nbf.v4.new_code_cell("display(Image(filename=str(RUN / 'figures' / 'F09_profiles_kmeans.png')))"),
+        nbf.v4.new_code_cell("display(Image(filename=str(RUN / 'figures' / 'F09_profiles_ward.png')))"),
+        nbf.v4.new_markdown_cell(
+            "## 3. Method agreement\n\n"
+            "Contingency + representative ARI; same-k ARI separates geometry from cluster count."
+        ),
+        nbf.v4.new_code_cell(
+            "print(pd.read_csv(RUN / 'tables' / 'contingency.csv', index_col=0))\n"
+            "pd.read_csv(latest_run('cluster')[1] / 'tables' / 'same_k_ari.csv').round(4)"
+        ),
+        nbf.v4.new_code_cell("display(Image(filename=str(RUN / 'figures' / 'F08_pca_panels.png')))"),
+        nbf.v4.new_code_cell("display(Image(filename=str(RUN / 'figures' / 'F10_agreement.png')))"),
+        nbf.v4.new_markdown_cell(
+            "## 4. Background AFTER freezing (descriptive only)\n\n"
+            "Every proportion states its denominator. No causal claims; clusters are not sources "
+            "or health grades."
+        ),
+        nbf.v4.new_code_cell(
+            "pd.read_csv(RUN / 'tables' / 'season_pct_of_cluster_kmeans.csv', index_col=0).round(3)"
+        ),
+        nbf.v4.new_code_cell("display(Image(filename=str(RUN / 'figures' / 'F11_background.png')))"),
+        nbf.v4.new_markdown_cell(
+            "## 5. Transformation sensitivity\n\n"
+            "raw+StandardScaler at frozen k vs the main log1p representation."
+        ),
+        nbf.v4.new_code_cell("pd.read_csv(RUN / 'sensitivity' / 'representation_ari.csv').round(4)"),
+        nbf.v4.new_markdown_cell(
+            "## 6. Report\n\n"
+            "The full English report generated from this run's numbers: `report.md` in the run "
+            "directory (stage export)."
+        ),
+    ]
+    nb.cells = cells
+    nb.metadata["kernelspec"] = {"display_name": "Python 3", "language": "python", "name": "python3"}
+    return nb
+
+
 def main() -> None:
     target_dir = ROOT / "notebooks"
     target_dir.mkdir(parents=True, exist_ok=True)
     for name, builder in (
         ("01_data_audit_and_eda.ipynb", build_01),
         ("02_clustering_experiments.ipynb", build_02),
+        ("03_interpretation_and_robustness.ipynb", build_03),
     ):
         nb = builder()
         nbf.validate(nb)

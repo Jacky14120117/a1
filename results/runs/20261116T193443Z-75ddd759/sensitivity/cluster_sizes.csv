@@ -1,0 +1,5 @@
+algorithm,cluster,n_days
+kmeans,0,1056
+kmeans,1,277
+ward,0,846
+ward,1,487
