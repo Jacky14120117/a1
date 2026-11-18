@@ -1,0 +1,30 @@
+{
+  "representation": "log1p_standard_scaler",
+  "feature_order": [
+    "PM2.5",
+    "PM10",
+    "SO2",
+    "NO2",
+    "CO",
+    "O3"
+  ],
+  "log_applied": true,
+  "scaler_mean": [
+    4.085465516342503,
+    4.457448432897732,
+    2.442343053688469,
+    3.9787770559027598,
+    6.8933876170755335,
+    3.715659551569246
+  ],
+  "scaler_scale": [
+    0.8582350860216811,
+    0.7292583666306464,
+    0.9288321706531587,
+    0.4977580652013511,
+    0.6757798592073518,
+    0.9494786214192661
+  ],
+  "n_samples": 1333,
+  "standard_deviation_convention": "population (ddof=0), sklearn StandardScaler"
+}

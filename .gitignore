@@ -229,3 +229,6 @@ __marimo__/
 /data/interim/
 /data/processed/
 /notebooks/executed/
+
+# Clean-room reproduction environment (rebuild from requirements-lock.txt)
+/.venv-clean/

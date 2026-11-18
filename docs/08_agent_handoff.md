@@ -87,3 +87,11 @@
 - 从头重跑全流水线：run `20261117T225450Z-75ddd759` 七阶段 completed 无警告；30 项测试通过；三本 Notebook 再次从头执行成功。
 - 复核结论：17 项校验 ALL CHECKS PASSED；与基线运行 `20261116T193443Z` 对比，89 组指标逐值一致、89 份划分 ARI=1、代表/稳定性/敏感性完全相同——结果可复现、无计算错误。唯一曾 FAIL 项为校验脚本整表 dtype 严格比较的误报（CSV 往返布尔列变 object），已改为逐列语义比较。
 - 权威报告现为 `results/runs/20261117T225450Z-75ddd759/report.md`；交付 Word 原地更新。
+
+### 2026-11-18（Asia/Shanghai）：T12 干净环境复现完成，模型测试验收闭环
+
+- 新建独立环境 `.venv-clean`（Python 3.12.10），仅按 `requirements-lock.txt` 安装（numpy 2.5.4 / pandas 3.1.1 / scikit-learn 1.9.1 等，与锁文件逐一对应）；`.venv-clean` 已加入 .gitignore，不入库。
+- 干净环境中 30 项测试全部通过；`--stage all` 七阶段 completed 无警告，run `20261118T150843Z-75ddd759`。
+- `verify_results.py --baseline 20261117T225450Z` 17 项 ALL CHECKS PASSED：89 组指标逐值一致、89 份划分 ARI=1、代表/稳定性/敏感性完全相同。至此三次独立运行（基线 193443Z、复核 225450Z、干净环境 150843Z）结果完全一致。
+- 交付清单验收项全部满足：无监督口径、来源哈希、六列/日期一致、多参数真实比较、DBSCAN 退化披露、同空间评价、簇差异证据、三类稳健性、PCA 仅展示、簇名来自观测、报告数字与运行一致、测试通过+干净复现+交接更新。
+- 剩余可选项：答辩 PPT（presentations/storyboard.md 已有 12 页结构建议），用户未要求前不启动。
