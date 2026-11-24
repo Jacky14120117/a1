@@ -296,3 +296,31 @@ def fig_f12_stability_sensitivity(
     fig.suptitle("F12 Robustness: data perturbation and transformation", y=1.02)
     fig.tight_layout()
     return _save(fig, path)
+
+
+def fig_f13_boxplots(
+    daily: pd.DataFrame, labels: np.ndarray, algorithm: str, mapping: dict[int, int], path: str | Path
+) -> Path:
+    """Per-cluster distributions in original units: separation vs overlap."""
+    frame = daily[POLLUTANTS].copy()
+    frame["display_cluster"] = [f"C{mapping.get(int(l), int(l) + 1)}" for l in labels]
+    order = sorted(frame["display_cluster"].unique())
+    fig, axes = plt.subplots(1, 6, figsize=(17, 4.8))
+    for ax, column in zip(axes, POLLUTANTS):
+        data = [frame.loc[frame["display_cluster"] == c, column].to_numpy() for c in order]
+        parts = ax.violinplot(data, showextrema=False)
+        for body in parts["bodies"]:
+            body.set_facecolor("#4878a8")
+            body.set_alpha(0.25)
+        ax.boxplot(data, tick_labels=[f"{c}\nn={len(d)}" for c, d in zip(order, data)],
+                   widths=0.35, showfliers=False)
+        ax.set_title(column, fontsize=9)
+        ax.set_ylabel(UNITS, fontsize=8)
+        ax.tick_params(labelsize=8)
+    fig.suptitle(
+        f"F13 {algorithm}: within-cluster spread and overlap, original units "
+        "(boxes = IQR, whiskers = 1.5 IQR, fliers hidden; violin = full density)",
+        y=1.02,
+    )
+    fig.tight_layout()
+    return _save(fig, path)

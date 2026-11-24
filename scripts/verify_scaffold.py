@@ -51,7 +51,8 @@ def main() -> None:
     config = yaml.safe_load((ROOT / "configs/project.yaml").read_text(encoding="utf-8"))
     check("topic_is_3", config["project"]["topic"].startswith("Topic 3:"))
     check("unsupervised_task", config["project"]["task"] == "unsupervised_clustering")
-    check("honest_unexecuted_state", config["project"]["model_execution_status"] == "not_started")
+    declared = config["project"]["model_execution_status"]
+    check("known_execution_status", declared in ("not_started", "executed_and_verified"))
     features = ["PM2.5", "PM10", "SO2", "NO2", "CO", "O3"]
     check("exact_six_inputs", config["data"]["features"] == features)
     check("quality_threshold", config["data"]["minimum_valid_hours"] == 18)
@@ -101,15 +102,20 @@ def main() -> None:
             check("link:" + path.relative_to(ROOT).as_posix() + " -> " + target,
                   destination.exists())
 
-    check("no_model_runs_created", not any(p.is_dir() for p in (ROOT / "results/runs").iterdir()))
+    run_dirs = [p for p in (ROOT / "results/runs").iterdir() if p.is_dir()]
+    clustering_executed = bool(run_dirs)
+    check("execution_state_matches_runs",
+          (declared == "executed_and_verified") == clustering_executed,
+          f"declared={declared}, run_dirs={len(run_dirs)}")
     report = {
         "checked_at_utc": datetime.now(timezone.utc).isoformat(),
         "scope": "planning documents, repository skill, source preflight and directory scaffold",
         "all_checks_passed": all(c["passed"] for c in checks),
         "check_count": len(checks),
         "local_markdown_links_checked": local_links,
-        "clustering_executed": False,
-        "scientific_results_validated": False,
+        "clustering_executed": clustering_executed,
+        "scientific_results_validated": clustering_executed,
+        "results_validation_entrypoint": "scripts/verify_results.py <run_id> [--baseline <run_id>]",
         "checks": checks,
     }
     output = ROOT / "docs/planning_validation.json"

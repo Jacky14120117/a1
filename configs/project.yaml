@@ -2,8 +2,8 @@ project:
   id: aisc5030-topic3-air-quality
   topic: "Topic 3: Knowledge Discovery from Scientific Data"
   task: unsupervised_clustering
-  stage: planning_and_scaffold_complete
-  model_execution_status: not_started
+  stage: experiments_complete
+  model_execution_status: executed_and_verified
   seed: 100
 data:
   uci_id: 501

@@ -2,7 +2,9 @@
 
 项目选题：**北京空气质量监测数据中的日污染模式发现：K-Means、Ward 层次聚类与 DBSCAN 的比较**。
 
-本仓库当前完成的是课程资料阅读、方案设计、数据可行性核验和项目骨架。**聚类实验、研究结论、最终报告与答辩 PPT 尚未执行或生成。** 用户已明确指定 Topic 3，后续工作必须保持无监督聚类与知识发现方向。
+本仓库已完成 **T01–T12 全流程**：环境与锁文件、来源核验、数据准备、EDA、89 个聚类候选、时间块稳定性与代表设置选择、簇解释与方法对比、变换敏感性、英文研究报告，以及干净环境复现验证。用户已明确指定 Topic 3，全部工作保持无监督聚类与知识发现方向。**答辩 PPT 尚未生成**（结构建议见 `presentations/storyboard.md`）。
+
+主要结果（详见最新运行目录的 `report.md`）：K-Means 与 Ward 代表划分均为 k=2，块稳定性中位 ARI 分别为 0.970 与 0.707，两者代表划分 ARI=0.892；DBSCAN 12 组中 11 组退化为单簇加噪声，无合格代表设置，说明数据更接近连续污染梯度。三次独立运行（含按锁文件重建的干净环境）结果完全一致。
 
 ## 阅读顺序
 
@@ -21,12 +23,20 @@
 已下载官方原始压缩包并核验选定 CSV：35,064 条小时记录，2013-03-01 至 2017-02-28，共 1,461 个日历日。按“六种污染物各自每天至少 18 条有效小时记录”的预设规则，得到 **1,333 个可用日**，排除 128 日。这是数据结构与覆盖率核验，尚不是聚类结果。完整哈希与计数见 [source_preflight.json](data/metadata/source_preflight.json)。
 
 ```powershell
-# 现在已经可运行，仅核验本地官方来源，不训练模型
+# 来源与骨架核验（不训练模型）
 python scripts/verify_source.py --extract-selected
 python scripts/verify_scaffold.py
+
+# 完整实验流水线：prepare → eda → cluster → stability → compare → sensitivity → export
+.\.venv\Scripts\python.exe scripts/run_project.py --stage all --config configs/project.yaml
+
+# 测试、笔记本与结果复核
+.\.venv\Scripts\python.exe -m pytest tests -q
+.\.venv\Scripts\python.exe scripts/run_notebooks.py
+.\.venv\Scripts\python.exe scripts/verify_results.py <run_id> --baseline <另一个run_id>
 ```
 
-详细方案中的 `run_project.py` 等实验入口属于**下阶段待实现接口**，当前不可直接运行。请先完成执行方案的 T01–T02，再按阶段实现和运行。依赖范围在 [requirements.txt](requirements.txt)，尚未安装验证或生成实验环境锁文件。
+依赖范围见 [requirements.txt](requirements.txt)，实际安装版本锁定在 [requirements-lock.txt](requirements-lock.txt)。每次运行写入独立的 `results/runs/<run_id>/`，含配置快照、数据与源码哈希、全部候选、标签、选参依据、稳定性、敏感性与报告；历史运行不被覆盖。
 
 ## Agent 入口
 

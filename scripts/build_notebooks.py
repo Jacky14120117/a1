@@ -237,6 +237,25 @@ def build_03() -> nbf.NotebookNode:
         nbf.v4.new_code_cell("display(Image(filename=str(RUN / 'figures' / 'F09_profiles_kmeans.png')))"),
         nbf.v4.new_code_cell("display(Image(filename=str(RUN / 'figures' / 'F09_profiles_ward.png')))"),
         nbf.v4.new_markdown_cell(
+            "### 2.1 Within-cluster spread first (protocol §8)\n\n"
+            "IQR/median is scale-free, so heterogeneity is comparable across pollutants. "
+            "A cluster is only a tidy 'type' if its own spread is small relative to its level."
+        ),
+        nbf.v4.new_code_cell(
+            "spread = pd.read_csv(RUN / 'tables' / 'cluster_spread.csv')\n"
+            "spread[spread.algorithm == 'kmeans'][['cluster','pollutant','n_days','median','iqr','iqr_over_median']].round(3)"
+        ),
+        nbf.v4.new_markdown_cell(
+            "### 2.2 Which pollutants separate the clusters, which overlap\n\n"
+            "Shared IQR span in original units and as a fraction of the pooled IQR span."
+        ),
+        nbf.v4.new_code_cell(
+            "ov = pd.read_csv(RUN / 'tables' / 'cluster_overlap.csv')\n"
+            "ov[ov.algorithm == 'kmeans'][['pollutant','iqr_overlap_width','overlap_fraction_of_pooled_iqr','median_ratio_b_over_a']].round(3)"
+        ),
+        nbf.v4.new_code_cell("display(Image(filename=str(RUN / 'figures' / 'F13_boxplots_kmeans.png')))"),
+        nbf.v4.new_code_cell("display(Image(filename=str(RUN / 'figures' / 'F13_boxplots_ward.png')))"),
+        nbf.v4.new_markdown_cell(
             "## 3. Method agreement\n\n"
             "Contingency + representative ARI; same-k ARI separates geometry from cluster count."
         ),
@@ -247,11 +266,23 @@ def build_03() -> nbf.NotebookNode:
         nbf.v4.new_code_cell("display(Image(filename=str(RUN / 'figures' / 'F08_pca_panels.png')))"),
         nbf.v4.new_code_cell("display(Image(filename=str(RUN / 'figures' / 'F10_agreement.png')))"),
         nbf.v4.new_markdown_cell(
+            "### 3.1 Largest split/merge cell, fixed rule\n\n"
+            "Largest off-diagonal cell under optimal matching (cluster numbers are arbitrary), "
+            "then the earliest five dates — never picked by visual impression."
+        ),
+        nbf.v4.new_code_cell(
+            "case = json.loads((RUN / 'tables' / 'disagreement_case.json').read_text(encoding='utf-8'))\n"
+            "print('cell:', case['cell']); print('counts:', case['counts'])\n"
+            "pd.DataFrame(case['examples']).round(1)"
+        ),
+        nbf.v4.new_markdown_cell(
             "## 4. Background AFTER freezing (descriptive only)\n\n"
             "Every proportion states its denominator. No causal claims; clusters are not sources "
             "or health grades."
         ),
         nbf.v4.new_code_cell(
+            "print('Eligible-day coverage by season (denominator for all seasonal percentages):')\n"
+            "print(pd.read_csv(RUN / 'tables' / 'season_coverage.csv').round(3))\n"
             "pd.read_csv(RUN / 'tables' / 'season_pct_of_cluster_kmeans.csv', index_col=0).round(3)"
         ),
         nbf.v4.new_code_cell("display(Image(filename=str(RUN / 'figures' / 'F11_background.png')))"),
@@ -259,7 +290,11 @@ def build_03() -> nbf.NotebookNode:
             "## 5. Transformation sensitivity\n\n"
             "raw+StandardScaler at frozen k vs the main log1p representation."
         ),
-        nbf.v4.new_code_cell("pd.read_csv(RUN / 'sensitivity' / 'representation_ari.csv').round(4)"),
+        nbf.v4.new_code_cell(
+            "print(pd.read_csv(RUN / 'sensitivity' / 'representation_ari.csv').round(4))\n"
+            "shift = pd.read_csv(RUN / 'sensitivity' / 'profile_shift.csv')\n"
+            "shift[shift.algorithm == 'kmeans'][['cluster','pollutant','median_main','median_raw','median_ratio_raw_over_main']].round(2)"
+        ),
         nbf.v4.new_markdown_cell(
             "## 6. Report\n\n"
             "The full English report generated from this run's numbers: `report.md` in the run "

@@ -34,26 +34,64 @@ def _md_table(frame: pd.DataFrame, float_fmt: str = ".3f") -> str:
 
 
 def _profile_narrative(profiles: pd.DataFrame, algorithm: str, mapping: dict[int, int]) -> str:
+    """Per-pollutant comparison against that pollutant's all-eligible-day median.
+
+    Comparing every pollutant to a single PM2.5 reference would mix units and
+    scales; each pollutant is judged against its own overall median instead.
+    """
     sub = profiles[profiles["algorithm"] == algorithm]
     lines = []
     ordered = sorted(sub["cluster"].unique(), key=lambda c: mapping.get(int(c), int(c)))
-    overall = sub[sub["pollutant"] == "PM2.5"]["median"].median()
+    overall = {}
+    for pollutant in FEATURE_ORDER:
+        rows = sub[sub["pollutant"] == pollutant]
+        overall[pollutant] = float(np.average(rows["median"], weights=rows["n_days"]))
     for cluster in ordered:
         rows = sub[sub["cluster"] == cluster].set_index("pollutant")
         n = int(rows.loc["PM2.5", "n_days"])
-        highs = [p for p in FEATURE_ORDER if rows.loc[p, "median"] > overall * 1.2]
-        pm = rows.loc["PM2.5", "median"]
-        o3 = rows.loc["O3", "median"]
+        ratios = {p: float(rows.loc[p, "median"]) / overall[p] if overall[p] > 0 else None
+                  for p in FEATURE_ORDER}
+        highs = [p for p in FEATURE_ORDER if ratios[p] is not None and ratios[p] > 1.2]
+        lows = [p for p in FEATURE_ORDER if ratios[p] is not None and ratios[p] < 0.8]
         desc = (
             f"- **Display C{mapping.get(int(cluster), int(cluster) + 1)}** (original label {int(cluster)}, n={n} days): "
-            f"PM2.5 median {pm:.1f} µg/m³ (IQR {rows.loc['PM2.5', 'q1']:.1f}–{rows.loc['PM2.5', 'q3']:.1f}), "
-            f"O3 median {o3:.1f} µg/m³. "
+            f"PM2.5 median {rows.loc['PM2.5', 'median']:.1f} µg/m³ "
+            f"(IQR {rows.loc['PM2.5', 'q1']:.1f}–{rows.loc['PM2.5', 'q3']:.1f}), "
+            f"O3 median {rows.loc['O3', 'median']:.1f} µg/m³. "
         )
+        parts = []
         if highs:
-            desc += "Relatively elevated: " + ", ".join(highs) + "."
-        else:
-            desc += "No pollutant median exceeds 1.2× the across-cluster PM2.5 median; comparatively low-load days."
+            parts.append("above 1.2× its own all-day median: "
+                         + ", ".join(f"{p} ({ratios[p]:.2f}×)" for p in highs))
+        if lows:
+            parts.append("below 0.8×: " + ", ".join(f"{p} ({ratios[p]:.2f}×)" for p in lows))
+        desc += ("; ".join(parts) + ".") if parts else "All six medians lie within 0.8–1.2× of their all-day medians."
         lines.append(desc)
+    return "\n".join(lines)
+
+
+def _case_narrative(case: dict | None) -> str:
+    if not case or case.get("status") != "ok":
+        return "No off-diagonal disagreement cell exists at the selected resolution (the two partitions coincide)."
+    cell, counts = case["cell"], case["counts"]
+    lines = [
+        f"Rule: {case['rule']}. Selected cell: K-Means cluster {cell['kmeans_cluster']} × Ward cluster "
+        f"{cell['ward_cluster']}, containing **{cell['n_days']} days**.",
+        "",
+        f"- K-Means cluster {cell['kmeans_cluster']} holds {counts['km_cluster_total']} days in total; "
+        f"Ward cluster {cell['ward_cluster']} holds {counts['ward_cluster_total']}.",
+        f"- Intersection {counts['intersection_days']} days; K-Means-only {counts['km_only_days']} days; "
+        f"Ward-only {counts['ward_only_days']} days.",
+        "",
+        "Earliest five dates in that cell, in original units (µg/m³):",
+        "",
+    ]
+    examples = pd.DataFrame(case["examples"])
+    if len(examples):
+        lines.append(_md_table(examples, float_fmt=".1f"))
+    medians = case.get("example_median_original_units") or {}
+    if medians:
+        lines += ["", "Their medians: " + ", ".join(f"{k} {v:.1f}" for k, v in medians.items()) + "."]
     return "\n".join(lines)
 
 
@@ -131,6 +169,8 @@ Selection (frozen before looking at any interpretation): minimum cluster size ma
 
 F01 shows monthly valid-hour fractions and eligible-day fractions; several months fall below the 18/24 rule. F02 shows why log1p is used. F03: Spearman ρ(PM2.5, PM10)={pm_pm10:.2f} and ρ(NO2, CO)={no2_co:.2f} — correlated pollutants receive repeated weight in euclidean distance, a limitation we discuss rather than silently "fix". F04 displays daily series with excluded days left as gaps.
 
+Missingness at both scales and the extreme-day index are tabulated in `tables/eda_hourly_missing.csv` and `tables/eda_extreme_days.csv`. The five highest daily means per pollutant are listed with the 99th-percentile threshold and were **retained**: an extreme value is only removed if the raw hours prove it erroneous, which was never the case here.
+
 ![F01](figures/F01_monthly_coverage.png)
 ![F02](figures/F02_distributions.png)
 ![F03](figures/F03_correlation.png)
@@ -183,6 +223,23 @@ Profiles are medians/IQRs of raw daily concentrations grouped by the actual labe
 ![F09 K-Means](figures/F09_profiles_kmeans.png)
 ![F09 Ward](figures/F09_profiles_ward.png)
 
+### 7.1 Within-cluster spread comes before any background story
+
+Protocol §8 requires comparing the dispersion *inside* a cluster before invoking season or weather. IQR/median is scale-free, so it is comparable across pollutants (original units, K-Means representative):
+
+{_md_table(compare["spread"][compare["spread"]["algorithm"] == "kmeans"][["cluster", "pollutant", "n_days", "median", "iqr", "iqr_over_median"]]) if "spread" in compare else "see tables/cluster_spread.csv"}
+
+### 7.2 Which pollutants actually separate the clusters, and which overlap
+
+Shared IQR span between the two clusters, in original units and as a fraction of the pooled IQR span (K-Means):
+
+{_md_table(compare["overlap"][compare["overlap"]["algorithm"] == "kmeans"][["pollutant", "iqr_overlap_width", "overlap_fraction_of_pooled_iqr", "median_ratio_b_over_a"]]) if "overlap" in compare else "see tables/cluster_overlap.csv"}
+
+The full distributions (not just medians) make the same point:
+
+![F13 K-Means](figures/F13_boxplots_kmeans.png)
+![F13 Ward](figures/F13_boxplots_ward.png)
+
 ## 8. Method agreement and disagreement
 
 Representative partitions: ARI={rep_ari:.3f}; contingency (rows K-Means, columns Ward):
@@ -198,7 +255,19 @@ The shared PCA projection (display only; PC1+PC2 explain {sum(variance[:2]):.1%}
 ![F08](figures/F08_pca_panels.png)
 ![F10](figures/F10_agreement.png)
 
+### 8.1 Case study of the largest split/merge cell (fixed selection rule)
+
+{_case_narrative(compare.get("case"))}
+
 ## 9. Background context (after frozen selection)
+
+Eligible-day coverage by season — the denominator that must accompany every seasonal percentage (2013 and 2017 are partial calendar years):
+
+{_md_table(compare["season_coverage"]) if "season_coverage" in compare else "see tables/season_coverage.csv"}
+
+Year composition, P(cluster | year), denominator = eligible days in that year:
+
+{_md_table(compare["years"][compare["years"]["algorithm"] == "kmeans"]) if "years" in compare else "see tables/year_composition.csv"}
 
 Season composition within each K-Means cluster (denominator = cluster days):
 
@@ -225,6 +294,10 @@ These associations are descriptive. Clusters are not pollution sources, not caus
 Raw+StandardScaler at the frozen k, compared with the main representation:
 
 {_md_table(sensitivity[["algorithm", "k", "ari_vs_main"]])}
+
+ARI alone is not enough: the protocol also requires the **original-unit profile change**. Median shift of each cluster under raw+StandardScaler relative to the main representation (K-Means):
+
+{_md_table(state["sensitivity_shift"][state["sensitivity_shift"]["algorithm"] == "kmeans"][["cluster", "pollutant", "median_main", "median_raw", "median_ratio_raw_over_main"]]) if "sensitivity_shift" in state else "see sensitivity/profile_shift.csv"}
 
 Block stability and transformation sensitivity together:
 

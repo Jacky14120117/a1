@@ -1,11 +1,12 @@
 {
-  "checked_at_utc": "2026-11-14T16:28:08.129625+00:00",
+  "checked_at_utc": "2026-11-18T15:27:43.489411+00:00",
   "scope": "planning documents, repository skill, source preflight and directory scaffold",
   "all_checks_passed": true,
-  "check_count": 126,
-  "local_markdown_links_checked": 36,
-  "clustering_executed": false,
-  "scientific_results_validated": false,
+  "check_count": 127,
+  "local_markdown_links_checked": 37,
+  "clustering_executed": true,
+  "scientific_results_validated": true,
+  "results_validation_entrypoint": "scripts/verify_results.py <run_id> [--baseline <run_id>]",
   "checks": [
     {
       "name": "directory:docs",
@@ -243,7 +244,7 @@
       "detail": ""
     },
     {
-      "name": "honest_unexecuted_state",
+      "name": "known_execution_status",
       "passed": true,
       "detail": ""
     },
@@ -568,6 +569,11 @@
       "detail": ""
     },
     {
+      "name": "link:README.md -> requirements-lock.txt",
+      "passed": true,
+      "detail": ""
+    },
+    {
       "name": "link:README.md -> AGENTS.md",
       "passed": true,
       "detail": ""
@@ -633,9 +639,9 @@
       "detail": ""
     },
     {
-      "name": "no_model_runs_created",
+      "name": "execution_state_matches_runs",
       "passed": true,
-      "detail": ""
+      "detail": "declared=executed_and_verified, run_dirs=16"
     }
   ]
 }

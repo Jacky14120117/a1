@@ -1,0 +1,387 @@
+{
+  "run_id": "20261124T223107Z-0c5c7f9d",
+  "stage": "prepare,eda,cluster,stability,compare,sensitivity,export",
+  "status": "completed",
+  "created_at_utc": "2026-11-24T22:31:21.276651+00:00",
+  "protocol_version": "v1",
+  "config_path": "configs/project.yaml",
+  "config_sha256": "0c5c7f9de744ec8ff53fab62a57d919329342ab7a132ed7a6b37fe1f98e30cda",
+  "environment": {
+    "python_version": "3.12.10",
+    "python_executable": "E:\\浏览器下载\\AISC5030-Group-Project\\AISC5030-Group-Project\\.venv\\Scripts\\python.exe",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "machine": "AMD64",
+    "packages": {
+      "numpy": "2.5.4",
+      "pandas": "3.1.1",
+      "scipy": "1.18.1",
+      "scikit-learn": "1.9.1",
+      "matplotlib": "3.11.2",
+      "seaborn": "0.13.2",
+      "PyYAML": "6.0.3",
+      "pytest": "9.2.0",
+      "nbclient": "0.11.0",
+      "jupyterlab": "4.6.6"
+    }
+  },
+  "source_code_sha256": {
+    "src/air_quality_clustering/__init__.py": "d3ca97b9f209df536596890768d1e29689a25bdbf832aa0331900a183bb24677",
+    "src/air_quality_clustering/clustering.py": "1326e0c314ca511567dc2516183231c489c3db0d7e4f77b779f0b389c9e4ab46",
+    "src/air_quality_clustering/config.py": "65475510fa7b3d3573255cb55927847fdba0d647688d90f54a48849e06e3d409",
+    "src/air_quality_clustering/data.py": "699088db71356edbca36191b3e011b109e89ecc734d0fafa9d60325ae66122ab",
+    "src/air_quality_clustering/discovery.py": "431041f12468de14f16267f4dc8bce279b47919884576418fb2775f2af76ae59",
+    "src/air_quality_clustering/evaluation.py": "da26229c84a52d80f48ee101a47003990b07616bba951e4bc75b0598727dd8ec",
+    "src/air_quality_clustering/features.py": "b37d16c684613f861ca91fe8b3de5fdb11b6de4667fd806a68b09c4bde8840bf",
+    "src/air_quality_clustering/plots.py": "de3bb213f579978147f7fc63e07438ce78c148f6bc04d235b91ef9382b7fe535",
+    "src/air_quality_clustering/provenance.py": "6f026872a01f26709c261f7caec11fcf12fde048772d9e6fe5a0e8dc03256caf",
+    "src/air_quality_clustering/report.py": "fb554c547c4a4ae8f0a90a7641046463830e818fa524428cb09538d4695f8af5",
+    "src/air_quality_clustering/stability.py": "c66ba2275e65a42711f0be034b46072beba22e035598b9ef0d0684cf2e035668",
+    "scripts/build_notebooks.py": "11a70eb91be5a1bb6adb543da403bd189a5dbb1a172852fffea725c4f5b1b0c5",
+    "scripts/run_notebooks.py": "48da8f9d902e9dcd5b21b101f0d929263b223a5caf91cf682084c516ee64d1ac",
+    "scripts/run_project.py": "0fb16e2466a6c77ebfd64774e502316ee813a87a4d94c0a8cff50f339917d846",
+    "scripts/verify_results.py": "4a7f5fa5d65e351ee8c63fa5a1972573597d990dfe9ea74ecfdc1c4158181d30",
+    "scripts/verify_scaffold.py": "ab07239759f95951158df7c688cba3c0c2d63c1dd80801fd2d0da5c11a2d1d3b",
+    "scripts/verify_source.py": "a81cad582b6fe4cb31f0e8b30af340f896a7fbea0eaf6b8f3bb254f3d97b7007"
+  },
+  "input_sha256": {
+    "data/raw/beijing_air_quality_source.zip": "b04da438b2f331ac0ffd45aebdfec0d20d2367feb5f6948c4b1f7ce1191e33c4",
+    "data/raw/PRSA_Data_Aotizhongxin_20130301-20170228.csv": "a94fbcfc71708b6ffdc033360163d91efb7f675e496f6b5860929aa96b96351b"
+  },
+  "output_sha256": {
+    "data/interim/hourly_clean.csv": "679c432bb88c25aa6394317e01fbd72aa0de508fe9c64a416bcaa8d9a6d8cbab",
+    "data/processed/daily_coverage.csv": "92ee9cd758f605066a968f2ce4d127113d4002e8d9067ea1f989bd03c304d179",
+    "data/processed/daily_pollutants.csv": "b98dadab1689ccbf47fa796d14f531181b1922694cc9be094ba6dc43d23b2936",
+    "data/processed/excluded_days.csv": "57a1c9c225a74593b461ccc613f8caa9553ee91e1683f15627882e23f87351cd",
+    "data/processed/daily_context.csv": "179f5b4e2c7683830f51049a7764016e43a2bb21888505590ac88091af5857af",
+    "data/processed/features_main.csv": "dfdedfae196ba4fa9c7e915406c3adcc59aaa3fb0553e93a99e32b79cbea9a73",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F01_monthly_coverage.png": "48799e499b92d05d064709dc8c1f4790833e04f57974dfd506668a4f40f975e1",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F02_distributions.png": "8e1cefb8b8cf4026fcef7a8ff71e77f640c95aa133c43cb8b05bf8a941d34aeb",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F03_correlation.png": "0f4ea58ac28c474009eb93a905f862265370a13c1fa2b3d12590eb041f8e95d1",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F04_time_series.png": "7dd66c3b99a3830f5dd2f47b9240cfa25ca0ce33efd3059a691cdb7710114108",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/eda_daily_quantiles.csv": "f171ccc1cd33bd836c457d8e655a6e4698203f26d3c76fd523e6ae6239767bb1",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/eda_spearman.csv": "3daf7dbdff1854a230ac873566919b6dc0682495b57be1fb8c68dce1b7b04293",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/eda_summary.json": "f39295ec4105ab681698d23b71672c18cb37cd1b850fbc92981920c0699c949f",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/eda_extreme_days.csv": "cb16299d6caacbfbb99ca6259b2ebf43e0eab22d5727467e60afa7f8ef0c17e6",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/eda_hourly_missing.csv": "22370b27355897173e31d68a902209e765c28a81380cb780808cb2773825b142",
+    "results/runs/20261124T223107Z-0c5c7f9d/experiments.csv": "5641f2a54352ba7f36c38011c7bc4158979520f521b0678b0332204450a719cf",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/kmeans_seed_ari.csv": "bf766535d216b10f56ca34ea5f8c9c50fb471912042f9160ae6aabf865ae8490",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/same_k_ari.csv": "a6cf8992635d5a8f6eed3445c30918ceb97da577063f6bc82cfcac7acb78aecd",
+    "results/runs/20261124T223107Z-0c5c7f9d/artifacts/ward_linkage.npy": "7d0c13c026d2aa953abb011f819971017871b0c4ebd326c24c12c66563b61870",
+    "results/runs/20261124T223107Z-0c5c7f9d/artifacts/dbscan_eps_grid.json": "4ba4df54e3b97c49b442f72d2c93aac28ebb17e9b2cf19cbb99d6f3373e5c940",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k2_s100.csv": "f199ccca1e885f01a4572aa3baf2954d86c66768c848f4e7b289745f43d557b3",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k2_s101.csv": "f199ccca1e885f01a4572aa3baf2954d86c66768c848f4e7b289745f43d557b3",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k2_s102.csv": "6268fe286bc4b4637df73c8dc3059d642edf87497a42bfd019847c8be68defa5",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k2_s103.csv": "6268fe286bc4b4637df73c8dc3059d642edf87497a42bfd019847c8be68defa5",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k2_s104.csv": "6268fe286bc4b4637df73c8dc3059d642edf87497a42bfd019847c8be68defa5",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k2_s105.csv": "f199ccca1e885f01a4572aa3baf2954d86c66768c848f4e7b289745f43d557b3",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k2_s106.csv": "f199ccca1e885f01a4572aa3baf2954d86c66768c848f4e7b289745f43d557b3",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k2_s107.csv": "6268fe286bc4b4637df73c8dc3059d642edf87497a42bfd019847c8be68defa5",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k2_s108.csv": "6268fe286bc4b4637df73c8dc3059d642edf87497a42bfd019847c8be68defa5",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k2_s109.csv": "6268fe286bc4b4637df73c8dc3059d642edf87497a42bfd019847c8be68defa5",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k3_s100.csv": "42dbfba80c98042cd4cf8367734d90d795d369a30f3074bc962f59d0999899d5",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k3_s101.csv": "e2cddb1ac8a1a0458821c76061e6239030a87a7da8814f71d04bf936a135af67",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k3_s102.csv": "42dbfba80c98042cd4cf8367734d90d795d369a30f3074bc962f59d0999899d5",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k3_s103.csv": "0cb3c6b7047fbf5f339b597aad5faaa6cab71b186f43a5df33fdfaaf1b423435",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k3_s104.csv": "42dbfba80c98042cd4cf8367734d90d795d369a30f3074bc962f59d0999899d5",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k3_s105.csv": "64c48c861b735c8ab4bf2c18473b9c222c5b701d4ab42205446d377aa1f8377b",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k3_s106.csv": "8492e0c580688d102a65b9949fc64e87fc9d988bd5e6ff05744068e319a2d877",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k3_s107.csv": "201367012829f11c356880f645bfdfb6fc5a159dd5165238346315f2159ca64c",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k3_s108.csv": "e2cddb1ac8a1a0458821c76061e6239030a87a7da8814f71d04bf936a135af67",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k3_s109.csv": "7768530ac7bcf4303c3b767a4f7315e33a72cd58558d78978004472ce157809c",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k4_s100.csv": "259b09f47ddbb414e5f0f2ad82ab43ec54f1c554dc72422b854a235c5c2cca35",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k4_s101.csv": "0127769d157e8e1ce36df56f217378d9c4ed33e144ed369e6e3751125fabd627",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k4_s102.csv": "cbdf290db70ba9982ea1c17c554ab1f8fe36ed2203b7b9777c9609434d76dc01",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k4_s103.csv": "b6b3350cf53798ff37844e7dcf3b6b25ff6054d5175a964122f8c6abb2769d69",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k4_s104.csv": "894f0797db2ce3046fbcb2f5fb3ad33387088036dde1ea6021e211db23e8c567",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k4_s105.csv": "6b76de1c14f992b8e8dc50d528f2427a7f728e38b7bb34c19312251563c06719",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k4_s106.csv": "8e04d773237e83be4cfbe2caa7f187b5c6d72c174bafff09225479b3cef34269",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k4_s107.csv": "79beda21b431f66465f26fde86c08566d8e2cd44337e08fbca33ccb8c4b5929f",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k4_s108.csv": "00c95d87cc4c8d409fd135c63d4279b49c8b80d5c3b206eee3ae1cb72dc180ef",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k4_s109.csv": "32025874b09ff402533ded323d4d47a0f0097061d3c9a9dc1930e7903b419f48",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k5_s100.csv": "ceec07a7ecd759626ae6e646a5a557e0d862dc9c69e2a6d4c2dac66bc57ec01c",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k5_s101.csv": "94217fd34083994d546501bcedf98e287f5c4cb30bedc1a27f5b1fb5ffab3ae7",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k5_s102.csv": "674a8f910bf6856fa57843df307ff0037c9ce6c5bb110a8121cff541b10295a0",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k5_s103.csv": "19747050b7e6e9a69e3c0f11042a8e399b65fafed154128ba7fdf7e90e061e9f",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k5_s104.csv": "51728a0431fdefba81b08d5cebc1a16be6fc7e31a56382dc6e97d6f2567bda16",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k5_s105.csv": "9f9ff50f1d7b379d9bbb4b0b16801b7f579f8c93eb857bac1ff5435f1c149cea",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k5_s106.csv": "941f288953cf82e6f25c14be4e5b1525bf48a5c5ad29679f872803a3365be7fd",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k5_s107.csv": "588dcbbb96c9b94a3b358fca1a1da6bf05227c1642b3a333a7020ec5a7521c13",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k5_s108.csv": "ff9312e2b05e3bcc15d00b26787d868db74a460f4b87d8bb6deb279dea685b43",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k5_s109.csv": "cb37f89174f2c292393d8871bc6b2ab5f8dbd76b1f9cfc3d80f39ee11d83e479",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k6_s100.csv": "412a529ddf1758660c4855df3fe9078c806aaa654de1b4472e6e1e71ba36821a",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k6_s101.csv": "2eb4e19f50df1ec8942f87680ba922c5cc1b0cb6be6744f8931b1774fea9609e",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k6_s102.csv": "503d438ce98efc9a4bffa0c70e4881cd1033f05df235fbd093364355fe7ebee0",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k6_s103.csv": "aeaf2f205fc994c913b7775c47adfc8d387b8a6488456b5ada8128e981f28e59",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k6_s104.csv": "f604b97f00daa924c6124062e129764929c904cd8a63f98bcd9b359a4b5f4acf",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k6_s105.csv": "efb14334ca6bc6c2528311d6934db29094c97c544773acb7579db938568014fa",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k6_s106.csv": "95d7f104020c46ddcf71bd11e833aeb32376865b5ed37df15b02ee2501da3cf7",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k6_s107.csv": "89be323e75fe383bcb5ad24a17dac4232e8ba0fbd5945d8eb80bd12fdc927232",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k6_s108.csv": "017ad1410b6e5ec4b5582e59ec4cccbcc077a47e9bb2cc1353abaaf4dad1f610",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k6_s109.csv": "994632351f5cd08580ef52f4e6ac45b205290adabd7db96abd81bee0a9e30556",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k7_s100.csv": "48fb0bcd566859a8a106448e8abcb12f555c471b099ba880d76ebbfcb0b29ab3",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k7_s101.csv": "0bc76f46a8b9a7a5024e32b676ad0aae21c81ee9c4c700ba11185f9a4ed2d545",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k7_s102.csv": "826ab0e58b9255c7da056633dcc0b5b3e0ca6687585044ff102bd27859b84ff5",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k7_s103.csv": "77baeeee5507cd92c72f2d56501ccc632a2c88e6bcdd3047eba1b0d8aa6a0dc0",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k7_s104.csv": "2fb136962b2afc32e1524092d237076def96411b010fbdc079284120e918af61",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k7_s105.csv": "3ab23f123b8fce5aa64ce1f81ee95a6e40c9c90c671eb41e8e3d075b6bc285c6",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k7_s106.csv": "b1efe99973694796349177f9822f336165e9a82cb3dda959d80c1e862952ad7f",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k7_s107.csv": "4f44465568ffb35156456fb42de3975fb6efd68355356671b1aa92aa99e1183a",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k7_s108.csv": "94e788e0e2dbba5a78775b5195257c94907902836b290d68f87c67d627629947",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k7_s109.csv": "8a91908eabb9fc8bcd4f09b7125bf87a5fd6a8394a4146ff49ff9d4f9ba4acd2",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k8_s100.csv": "06805bf271df077aed1e5689415ee6bdb364085326335186b931af493660d875",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k8_s101.csv": "d96f438a848db5a9321a3072dbb51f8304539fd89e9d2f849a964097d46ea504",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k8_s102.csv": "093d808a847eb96b9c200a5c6ea9ed5381ec3bcc172d9d92823f0548d546ac6b",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k8_s103.csv": "cb7a5f3d6c8fb850f2719380d8dd9b8022ae44ce97705ad03cfe44054173e4e1",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k8_s104.csv": "062d5665cbacd9caca381022a21307ed3e7e87488edda25405a626e16f6dc2c7",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k8_s105.csv": "52771814ac18d39c4a95ea189e0017059a7e4c55402d72a91817e33f32a9ab45",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k8_s106.csv": "aeea4ca0059771d02a1d58fd33bfa97517615548dc6c4451550f44de233407a2",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k8_s107.csv": "6254989e200d86b26daae9e099cac952ead46a702b3c167881e3ea2e57d34942",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k8_s108.csv": "f4a6f86a32017f97f81a57e59a3bec150e26f56f195415dee5e661cc04fb512f",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E01_k8_s109.csv": "94584a0a22ada46886f175f6387882fe8f54a34d825be52fff7ee91361bcbf6b",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E02_k2.csv": "f27517e7ce22798d700993e758f76731d7f65a13d661658a959f950fa15ea863",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E02_k3.csv": "9bb73f562308b4d38cdefb627b1035a8cfc5bf5d7515327254a4e4d39c44e901",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E02_k4.csv": "768aa329eafe99ebd064f7e140fb5e2d782a68a92d9761472b15bdbd5db322af",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E02_k5.csv": "a8ae13cf3af83db3e04ed2328a01bb2612ade0da74a1bf1afcc96e69a8a1ff9d",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E02_k6.csv": "c526d64942f362b6375b64dd6954b1558b90fd6a6e16eae3ac217321698ba726",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E02_k7.csv": "7ce08edec5fb910704a2446fe33dc176bb0b1426a54eb5e034107a5969aa99a4",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E02_k8.csv": "1bb4ea8b23ef77288b35e03fcc1c4fa9a1399bce656baefc0f9440a080fb17e0",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E03_m5_q70.csv": "3391fb9b6cbf943589d7d0d5e54155730d02905420852f26a2c2248815f39b18",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E03_m5_q80.csv": "c3a10b9e9e3f0f6e300075d374fc6777d64ad354ab5e185c7a2f60b9cf12ff89",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E03_m5_q90.csv": "b954ec9c0d6889ff419cec1b2cd63eda85db43e6e1033d9ab1fdbed4c0ebe629",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E03_m5_q95.csv": "b4f9c706621e6d649fc45795b0a7b2b22eb8c6f3f09f402c45c4fa879a012967",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E03_m10_q70.csv": "19dddf493bf3a93d65871f092ec7d40f0c7ff22d5503e2063282e8871ca36a4f",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E03_m10_q80.csv": "fc2e6f710c88bec07c193804c3665584fbaea8bc0897147a91adf59b197ebe80",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E03_m10_q90.csv": "6f1ba89ab417d94c282e8c10c2be66f987a4982294dcec26b0627f1f6a507668",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E03_m10_q95.csv": "904f0f7311291fdb10d3ee6a3824d4f648ce4835021086909542c8d4cda546f4",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E03_m20_q70.csv": "e5c1e1d55be6b0322c431212b0be55ac732886787c5b6c29037769c2ccdfd9ba",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E03_m20_q80.csv": "1af7f0162cbf5ff648773ff9d12a20861b10ea77c9961ce92350181a5061854e",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E03_m20_q90.csv": "d7d6838995b19a4c0ba84a3268938e701f995909df524d81262cf2a51a4b5166",
+    "results/runs/20261124T223107Z-0c5c7f9d/labels/E03_m20_q95.csv": "e3ca73e7fb2ff96537864eb752ceeccb009686cded89856cb4ec2b78bc296673",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F05_kmeans_metrics.png": "df30cd6e5c73052267dba78eb1a74e4cdb75958208ec499cd3d0a7c02ba1a556",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F06_dendrogram.png": "46f86aa7fefae87b4f6a880c1ba14c0687ad464d2e8fd94f988dd2e8bc7bf1dc",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F07_dbscan.png": "b13e4ca7f21f9088a5e5654029034a8df2980cef0f107dc0f156dd2164e3aa74",
+    "results/runs/20261124T223107Z-0c5c7f9d/stability/repetitions.csv": "d9581f86df0adb8f544827114502f9edba4b9f7bd93340108b8c92241ca76fdd",
+    "results/runs/20261124T223107Z-0c5c7f9d/stability/aggregate.csv": "fa31b20168e1872a222ff0c49e81fa0f0d1dddcddbbe1750f784e8864b081eb9",
+    "results/runs/20261124T223107Z-0c5c7f9d/selection.json": "03f9d45a20aad9cd8a9a57d5dfdaf41d0d95020f0918871fb53af76cdcc0b7e8",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F08_pca_panels.png": "d438383da37daedd56c577220d22c086fc3cc0113b5745577efe9b7b8d609a9b",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F09_profiles_kmeans.png": "86e7503685363dbc5a12ec491a3c0eb3482877392eff699fbf2264b86a985ce0",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F09_profiles_ward.png": "a091aa283ff5ef679b98b429acbe45601ef5b8b39e1536dc25d059c5bf69da7c",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F10_agreement.png": "e28bb41d006cb5f748e8c23a209eb66463fa3350da459100e6a4e0290376988a",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F11_background.png": "eace0cafb1f62936b71ba6452f9fdd63e83d1d09e9ecd8f49c1c4e0dd8e7363f",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F13_boxplots_kmeans.png": "a6bd412741817f30430b793ecd3f8df9802f797821e040d75acdbb3a5a5e450c",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F13_boxplots_ward.png": "9174b5478357e15c8a8dfecfb7fcf81f3cebddbda22cc85eabc07fd31d778a6e",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/cluster_profiles.csv": "6ded88a1c19300d53ef67038fb6712a4e1108b3c8f080f8eb5f93bcc6e97e90c",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/contingency.csv": "2921031f8d544ff163b2c119a24e38af9ce655e306c82c7bc6f613a186dcf4c9",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/weather_profiles.csv": "4af30e264ef98fd6b7b7f5d26c657dc7ba402be3b11f47d49b5675cf0371c5e4",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/cluster_spread.csv": "46bded6eeba3d6fd6662d0a805b6f17c6d075d1872a599e88a24a87261913e9f",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/cluster_overlap.csv": "84e52ab38922c602e434281a3463043dfb7330a4b2f95f53c8509d18f47f1a8b",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/disagreement_case.json": "8044ec8921c1699fc0072a679fcf0c5c86949f6899e9a239df1bfc10fb0f0d6d",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/season_coverage.csv": "9db144bd5ff691c3664a091ad7433da1bc7c65c2a25b9d83f748a3ed36c954e8",
+    "results/runs/20261124T223107Z-0c5c7f9d/tables/year_composition.csv": "c94908be4d1d09c26193fecd4916231ad5c5bcfce18466d755a7442c0d494ff5",
+    "results/runs/20261124T223107Z-0c5c7f9d/figures/F12_stability_sensitivity.png": "531148b542b4054b368b2a2e5def1e5319e3eca3d46f2371555e9ffec7fb1df5",
+    "results/runs/20261124T223107Z-0c5c7f9d/sensitivity/representation_ari.csv": "65d925284fd192ebc13c58984bbf2eb902b19c90ebc676b3b63f8e341906aed6",
+    "results/runs/20261124T223107Z-0c5c7f9d/sensitivity/cluster_sizes.csv": "15dd18c67102f298cdf4aa99776c6a22c3c37205881090312babb6e795aa2456",
+    "results/runs/20261124T223107Z-0c5c7f9d/sensitivity/profiles_raw_scaler.csv": "77a88db93651089ea41296c6c1dbfb2521f91a02c83abda2f1ad623a2df3e20f",
+    "results/runs/20261124T223107Z-0c5c7f9d/sensitivity/profile_shift.csv": "fe68f75917ed1a97e32d316d6e5f15f9577804cf747f23abad43b7df6de57c4c",
+    "results/runs/20261124T223107Z-0c5c7f9d/sensitivity/labels_kmeans_raw_scaler.csv": "ca8453718aa15026d7c7762fe800f298d09fa670060427c60b7b0996157e3292",
+    "results/runs/20261124T223107Z-0c5c7f9d/sensitivity/labels_ward_raw_scaler.csv": "b5a775559c58efdc72c68eb50da2201f544ce584f0877a241bb9ee765d78d39f",
+    "results/runs/20261124T223107Z-0c5c7f9d/report.md": "7407bb0f45c32a40cbc5b1b94f64d84c9750b86044b3f39422dfd4978871249e"
+  },
+  "stage_summary": {
+    "prepare": {
+      "hourly_audit": {
+        "rows_read": 35064,
+        "rows_written": 35064,
+        "duplicate_identical_rows_removed": 0,
+        "missing_counts": {
+          "year": 0,
+          "month": 0,
+          "day": 0,
+          "hour": 0,
+          "PM2.5": 1850,
+          "PM10": 1436,
+          "SO2": 1870,
+          "NO2": 2046,
+          "CO": 3552,
+          "O3": 3438,
+          "TEMP": 40,
+          "PRES": 40,
+          "DEWP": 40,
+          "WSPM": 28,
+          "RAIN": 40
+        },
+        "negative_counts": {
+          "PM2.5": 0,
+          "PM10": 0,
+          "SO2": 0,
+          "NO2": 0,
+          "CO": 0,
+          "O3": 0
+        },
+        "invalid_tokens": [],
+        "first_timestamp": "2013-03-01T00:00:00",
+        "last_timestamp": "2017-02-28T23:00:00"
+      },
+      "acceptance_checks": {
+        "coverage_rows": 1461,
+        "expected_calendar_days": 1461,
+        "eligible_days": 1333,
+        "expected_eligible_days": 1333,
+        "excluded_days": 128,
+        "main_matrix_shape": [
+          1333,
+          6
+        ],
+        "dates_unique_sorted": true
+      },
+      "scaler_params": {
+        "representation": "log1p_standard_scaler",
+        "feature_order": [
+          "PM2.5",
+          "PM10",
+          "SO2",
+          "NO2",
+          "CO",
+          "O3"
+        ],
+        "log_applied": true,
+        "scaler_mean": [
+          4.085465516342503,
+          4.457448432897732,
+          2.442343053688469,
+          3.9787770559027598,
+          6.8933876170755335,
+          3.715659551569246
+        ],
+        "scaler_scale": [
+          0.8582350860216811,
+          0.7292583666306464,
+          0.9288321706531587,
+          0.4977580652013511,
+          0.6757798592073518,
+          0.9494786214192661
+        ],
+        "n_samples": 1333,
+        "standard_deviation_convention": "population (ddof=0), sklearn StandardScaler"
+      },
+      "eligible_days_by_year": {
+        "2013": 234,
+        "2014": 335,
+        "2015": 351,
+        "2016": 356,
+        "2017": 57
+      }
+    },
+    "eda": {
+      "figures": [
+        "F01_monthly_coverage.png",
+        "F02_distributions.png",
+        "F03_correlation.png",
+        "F04_time_series.png"
+      ],
+      "missing_summary": {
+        "calendar_days": 1461,
+        "eligible_days": 1333,
+        "excluded_days": 128,
+        "hourly_missing_counts": {
+          "year": 0,
+          "month": 0,
+          "day": 0,
+          "hour": 0,
+          "PM2.5": 1850,
+          "PM10": 1436,
+          "SO2": 1870,
+          "NO2": 2046,
+          "CO": 3552,
+          "O3": 3438,
+          "TEMP": 40,
+          "PRES": 40,
+          "DEWP": 40,
+          "WSPM": 28,
+          "RAIN": 40
+        }
+      }
+    },
+    "cluster": {
+      "candidate_rows": 89,
+      "expected_candidate_rows": 89,
+      "status_counts": {
+        "dbscan:ok": 12,
+        "kmeans:ok": 70,
+        "ward:ok": 7
+      },
+      "label_files": 89,
+      "figures": [
+        "F05_kmeans_metrics.png",
+        "F06_dendrogram.png",
+        "F07_dbscan.png"
+      ]
+    },
+    "stability": {
+      "shortlisted_kmeans": [
+        2
+      ],
+      "shortlisted_ward": [
+        2
+      ],
+      "representatives": {
+        "kmeans": 2,
+        "ward": 2
+      },
+      "median_ari": {
+        "kmeans": 0.9701244954224121,
+        "ward": 0.707461533010092
+      },
+      "weak_stability": {
+        "kmeans": false,
+        "ward": false
+      },
+      "dbscan_representative": null,
+      "dbscan_reason": "no_setting_meets_two_clusters_min_size_coverage_and_valid_metrics"
+    },
+    "compare": {
+      "representative_ari": 0.8916962935412481,
+      "pca_variance": [
+        0.6723887842821188,
+        0.14730930559553343
+      ],
+      "figures": [
+        "F08_pca_panels.png",
+        "F09_profiles_kmeans.png",
+        "F09_profiles_ward.png",
+        "F10_agreement.png",
+        "F11_background.png",
+        "F13_boxplots_kmeans.png",
+        "F13_boxplots_ward.png"
+      ]
+    },
+    "sensitivity": {
+      "ari_vs_main": [
+        {
+          "algorithm": "kmeans",
+          "k": 2,
+          "ari_vs_main": 0.39165225018976485
+        },
+        {
+          "algorithm": "ward",
+          "k": 2,
+          "ari_vs_main": 0.71857738812635
+        }
+      ]
+    },
+    "export": {
+      "report": "E:\\浏览器下载\\AISC5030-Group-Project\\AISC5030-Group-Project\\results\\runs\\20261124T223107Z-0c5c7f9d\\report.md"
+    }
+  },
+  "warnings": [],
+  "error": null,
+  "stages_completed": [
+    "prepare",
+    "eda",
+    "cluster",
+    "stability",
+    "compare",
+    "sensitivity",
+    "export"
+  ]
+}

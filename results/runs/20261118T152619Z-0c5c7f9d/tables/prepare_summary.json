@@ -1,0 +1,84 @@
+{
+  "hourly_audit": {
+    "rows_read": 35064,
+    "rows_written": 35064,
+    "duplicate_identical_rows_removed": 0,
+    "missing_counts": {
+      "year": 0,
+      "month": 0,
+      "day": 0,
+      "hour": 0,
+      "PM2.5": 1850,
+      "PM10": 1436,
+      "SO2": 1870,
+      "NO2": 2046,
+      "CO": 3552,
+      "O3": 3438,
+      "TEMP": 40,
+      "PRES": 40,
+      "DEWP": 40,
+      "WSPM": 28,
+      "RAIN": 40
+    },
+    "negative_counts": {
+      "PM2.5": 0,
+      "PM10": 0,
+      "SO2": 0,
+      "NO2": 0,
+      "CO": 0,
+      "O3": 0
+    },
+    "invalid_tokens": [],
+    "first_timestamp": "2013-03-01T00:00:00",
+    "last_timestamp": "2017-02-28T23:00:00"
+  },
+  "acceptance_checks": {
+    "coverage_rows": 1461,
+    "expected_calendar_days": 1461,
+    "eligible_days": 1333,
+    "expected_eligible_days": 1333,
+    "excluded_days": 128,
+    "main_matrix_shape": [
+      1333,
+      6
+    ],
+    "dates_unique_sorted": true
+  },
+  "scaler_params": {
+    "representation": "log1p_standard_scaler",
+    "feature_order": [
+      "PM2.5",
+      "PM10",
+      "SO2",
+      "NO2",
+      "CO",
+      "O3"
+    ],
+    "log_applied": true,
+    "scaler_mean": [
+      4.085465516342503,
+      4.457448432897732,
+      2.442343053688469,
+      3.9787770559027598,
+      6.8933876170755335,
+      3.715659551569246
+    ],
+    "scaler_scale": [
+      0.8582350860216811,
+      0.7292583666306464,
+      0.9288321706531587,
+      0.4977580652013511,
+      0.6757798592073518,
+      0.9494786214192661
+    ],
+    "n_samples": 1333,
+    "standard_deviation_convention": "population (ddof=0), sklearn StandardScaler"
+  },
+  "eligible_days_by_year": {
+    "2013": 234,
+    "2014": 335,
+    "2015": 351,
+    "2016": 356,
+    "2017": 57
+  }
+}

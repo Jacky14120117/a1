@@ -182,10 +182,45 @@ def stage_eda(cfg, run_dir: Path, state: dict) -> dict:
     }
     provenance.write_json(tables_dir / "eda_summary.json", missing_summary)
 
+    # Protocol T04: missingness at BOTH scales, plus an extreme-day index.
+    # Extreme values are flagged for review only — never deleted for being large.
+    hourly_path = cfg.root / "data" / "interim" / "hourly_clean.csv"
+    hourly_missing_rows = []
+    if hourly_path.exists():
+        hourly = pd.read_csv(hourly_path)
+        for column in POLLUTANTS_ORDER:
+            values = hourly[column]
+            hourly_missing_rows.append({
+                "pollutant": column, "hourly_rows": int(len(values)),
+                "missing_hours": int(values.isna().sum()),
+                "missing_fraction": float(values.isna().mean()),
+            })
+    hourly_missing = pd.DataFrame(hourly_missing_rows)
+    if len(hourly_missing):
+        _write_csv(hourly_missing, tables_dir / "eda_hourly_missing.csv")
+
+    extreme_rows = []
+    for column in POLLUTANTS_ORDER:
+        threshold = float(daily[column].quantile(0.99))
+        top = daily.nlargest(5, column)
+        for _, row in top.iterrows():
+            extreme_rows.append({
+                "pollutant": column, "date": row["date"], "daily_mean": float(row[column]),
+                "p99_threshold": threshold,
+                "action": "retained_for_review; not removed for magnitude",
+            })
+    extremes = pd.DataFrame(extreme_rows)
+    _write_csv(extremes, tables_dir / "eda_extreme_days.csv")
+
     outputs = {**{k: Path(v) for k, v in figures.items()},
                "eda_daily_quantiles": tables_dir / "eda_daily_quantiles.csv",
                "eda_spearman": tables_dir / "eda_spearman.csv",
-               "eda_summary": tables_dir / "eda_summary.json"}
+               "eda_summary": tables_dir / "eda_summary.json",
+               "eda_extreme_days": tables_dir / "eda_extreme_days.csv"}
+    if len(hourly_missing):
+        outputs["eda_hourly_missing"] = tables_dir / "eda_hourly_missing.csv"
+    state["eda_extremes"] = extremes
+    state["eda_hourly_missing"] = hourly_missing
     summary = {"figures": [p.name for p in figures.values()], "missing_summary": missing_summary}
     return {"outputs": outputs, "summary": summary, "warnings": [],
             "checks": {"figures_written": len(figures)}}
@@ -428,6 +463,26 @@ def stage_compare(cfg, run_dir: Path, state: dict) -> dict:
     if db_rep is not None:
         panels[f"DBSCAN {db_rep['experiment_id']}"] = labels[db_rep["experiment_id"]]
 
+    # Protocol §8: within-cluster spread FIRST, then background; §7: overlap
+    # evidence and a fixed-rule split/merge case study.
+    spread = pd.concat([
+        discovery.cluster_spread(daily, lab, algorithm) for algorithm, (_, lab) in reps.items()
+    ], ignore_index=True)
+    _write_csv(spread, run_dir / "tables" / "cluster_spread.csv")
+    overlaps = pd.concat([
+        discovery.overlap_evidence(spread, algorithm) for algorithm in reps
+    ], ignore_index=True)
+    _write_csv(overlaps, run_dir / "tables" / "cluster_overlap.csv")
+    case = discovery.disagreement_case(daily, km_lab, ward_lab, top_n=5)
+    provenance.write_json(run_dir / "tables" / "disagreement_case.json", case)
+    season_cov = discovery.season_coverage(state["tables"]["daily_coverage"], context)
+    _write_csv(season_cov, run_dir / "tables" / "season_coverage.csv")
+    years = pd.concat([
+        discovery.year_composition(context, lab, daily, algorithm)
+        for algorithm, (_, lab) in reps.items()
+    ], ignore_index=True)
+    _write_csv(years, run_dir / "tables" / "year_composition.csv")
+
     figures_dir = run_dir / "figures"
     figures = {
         "F08_pca": plots.fig_f08_pca_panels(coords, variance, panels, mappings, figures_dir / "F08_pca_panels.png"),
@@ -437,6 +492,8 @@ def stage_compare(cfg, run_dir: Path, state: dict) -> dict:
         "F11_background": plots.fig_f11_background(
             background["season_pct_of_cluster"]["kmeans"], weather[weather["algorithm"] == "kmeans"],
             figures_dir / "F11_background.png"),
+        "F13_kmeans": plots.fig_f13_boxplots(daily, km_lab, "kmeans", mappings["kmeans"], figures_dir / "F13_boxplots_kmeans.png"),
+        "F13_ward": plots.fig_f13_boxplots(daily, ward_lab, "ward", mappings["ward"], figures_dir / "F13_boxplots_ward.png"),
     }
     state["compare"] = {"representative_ari": rep_ari, "mappings": mappings,
                         "reps": {a: k for a, (k, _) in reps.items()},
@@ -444,12 +501,19 @@ def stage_compare(cfg, run_dir: Path, state: dict) -> dict:
                         "contingency": cont, "weather": weather,
                         "season": background["season_pct_of_cluster"]["kmeans"],
                         "season_ward": background["season_pct_of_cluster"]["ward"],
-                        "season_of_season": background["season_pct_of_season"]["kmeans"]}
+                        "season_of_season": background["season_pct_of_season"]["kmeans"],
+                        "spread": spread, "overlap": overlaps, "case": case,
+                        "season_coverage": season_cov, "years": years}
     state["compare_run"] = run_dir
     outputs = {**{k: Path(v) for k, v in figures.items()},
                "cluster_profiles": run_dir / "tables" / "cluster_profiles.csv",
                "contingency": run_dir / "tables" / "contingency.csv",
-               "weather_profiles": run_dir / "tables" / "weather_profiles.csv"}
+               "weather_profiles": run_dir / "tables" / "weather_profiles.csv",
+               "cluster_spread": run_dir / "tables" / "cluster_spread.csv",
+               "cluster_overlap": run_dir / "tables" / "cluster_overlap.csv",
+               "disagreement_case": run_dir / "tables" / "disagreement_case.json",
+               "season_coverage": run_dir / "tables" / "season_coverage.csv",
+               "year_composition": run_dir / "tables" / "year_composition.csv"}
     summary = {"representative_ari": rep_ari, "pca_variance": variance.tolist(),
                "figures": [p.name for p in figures.values()]}
     return {"outputs": outputs, "summary": summary, "warnings": [],
@@ -473,6 +537,31 @@ def stage_sensitivity(cfg, run_dir: Path, state: dict) -> dict:
     _write_csv(sens_df, run_dir / "sensitivity" / "representation_ari.csv")
     _write_csv(sizes_df, run_dir / "sensitivity" / "cluster_sizes.csv")
 
+    # Protocol §8 also requires the ORIGINAL-UNIT profile change, not just ARI.
+    daily = state["tables"]["daily_pollutants"]
+    branch_labels = discovery.sensitivity_labels(daily, ks, cfg)
+    branch_profiles = pd.concat([
+        discovery.cluster_profiles(daily, lab, algorithm) for algorithm, lab in branch_labels.items()
+    ], ignore_index=True)
+    branch_profiles["representation"] = cfg.sensitivity_representation
+    _write_csv(branch_profiles, run_dir / "sensitivity" / "profiles_raw_scaler.csv")
+    for algorithm, lab in branch_labels.items():
+        _write_csv(pd.DataFrame({"date": daily["date"], "cluster": lab}),
+                   run_dir / "sensitivity" / f"labels_{algorithm}_raw_scaler.csv")
+    main_profiles = state.get("compare", {}).get("profiles")
+    if main_profiles is None:
+        upstream_c = _latest_completed_run(cfg.root, "compare")
+        main_profiles = pd.read_csv(upstream_c / "tables" / "cluster_profiles.csv")
+    delta = main_profiles.merge(
+        branch_profiles.drop(columns=["representation"]),
+        on=["algorithm", "cluster", "pollutant"], suffixes=("_main", "_raw"),
+    )
+    delta["median_shift"] = delta["median_raw"] - delta["median_main"]
+    delta["median_ratio_raw_over_main"] = delta["median_raw"] / delta["median_main"]
+    _write_csv(delta, run_dir / "sensitivity" / "profile_shift.csv")
+    state["sensitivity_profiles"] = branch_profiles
+    state["sensitivity_shift"] = delta
+
     agg = state.get("stability_agg")
     if agg is None:
         upstream = _latest_completed_run(cfg.root, "stability")
@@ -483,7 +572,11 @@ def stage_sensitivity(cfg, run_dir: Path, state: dict) -> dict:
     state["sensitivity"] = sens_df
     outputs = {**{k: Path(v) for k, v in figures.items()},
                "representation_ari": run_dir / "sensitivity" / "representation_ari.csv",
-               "sensitivity_sizes": run_dir / "sensitivity" / "cluster_sizes.csv"}
+               "sensitivity_sizes": run_dir / "sensitivity" / "cluster_sizes.csv",
+               "sensitivity_profiles": run_dir / "sensitivity" / "profiles_raw_scaler.csv",
+               "sensitivity_shift": run_dir / "sensitivity" / "profile_shift.csv"}
+    for algorithm in branch_labels:
+        outputs[f"sensitivity_labels_{algorithm}"] = run_dir / "sensitivity" / f"labels_{algorithm}_raw_scaler.csv"
     summary = {"ari_vs_main": sens_df[["algorithm", "k", "ari_vs_main"]].to_dict(orient="records")}
     return {"outputs": outputs, "summary": summary, "warnings": [],
             "checks": {"sensitivity_rows": len(sens_df)}}
@@ -522,6 +615,16 @@ def stage_export(cfg, run_dir: Path, state: dict) -> dict:
         compare["season"] = pd.read_csv(upstream_c / "tables" / "season_pct_of_cluster_kmeans.csv", index_col=0)
         compare["season_ward"] = pd.read_csv(upstream_c / "tables" / "season_pct_of_cluster_ward.csv", index_col=0)
         compare["season_of_season"] = pd.read_csv(upstream_c / "tables" / "season_pct_of_season_kmeans.csv", index_col=0)
+        compare["spread"] = pd.read_csv(upstream_c / "tables" / "cluster_spread.csv")
+        compare["overlap"] = pd.read_csv(upstream_c / "tables" / "cluster_overlap.csv")
+        compare["case"] = json.loads((upstream_c / "tables" / "disagreement_case.json").read_text(encoding="utf-8"))
+        compare["season_coverage"] = pd.read_csv(upstream_c / "tables" / "season_coverage.csv")
+        compare["years"] = pd.read_csv(upstream_c / "tables" / "year_composition.csv")
+    if "sensitivity_shift" not in state:
+        upstream_s = state.get("sensitivity_run") or _latest_completed_run(cfg.root, "sensitivity")
+        shift_path = upstream_s / "sensitivity" / "profile_shift.csv"
+        if shift_path.exists():
+            state["sensitivity_shift"] = pd.read_csv(shift_path)
     if compare.get("representative_ari") is None:
         labels = state["labels"]
         k_km, k_w = compare["reps"]["kmeans"], compare["reps"]["ward"]
